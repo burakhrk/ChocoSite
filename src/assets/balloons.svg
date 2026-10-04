@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 800" role="img" aria-label="Flying balloon gift">
+  <rect width="700" height="800" fill="#eef3ef"/>
+  <path d="M350 626c-38-120-112-197-150-296" stroke="#8a7a6e" stroke-width="8" fill="none"/>
+  <path d="M352 626c34-134 117-209 161-345" stroke="#8a7a6e" stroke-width="8" fill="none"/>
+  <path d="M350 626c-5-120 5-214 0-360" stroke="#8a7a6e" stroke-width="8" fill="none"/>
+  <ellipse cx="350" cy="658" rx="190" ry="42" fill="#3d2520" opacity=".11"/>
+  <path d="M221 183c0-70 47-124 109-124s109 54 109 124c0 73-65 137-109 177-44-40-109-104-109-177Z" fill="#b94755"/>
+  <path d="M95 293c0-60 42-107 96-107s96 47 96 107c0 63-57 118-96 152-39-34-96-89-96-152Z" fill="#e7b75f"/>
+  <path d="M415 253c0-67 47-119 105-119s105 52 105 119c0 70-62 131-105 168-43-37-105-98-105-168Z" fill="#6d8d73"/>
+  <rect x="240" y="562" width="220" height="90" rx="22" fill="#f3d8b1"/>
+</svg>

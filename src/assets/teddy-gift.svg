@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 800" role="img" aria-label="Children celebration gift">
+  <rect width="700" height="800" fill="#f8efe7"/>
+  <ellipse cx="350" cy="660" rx="230" ry="48" fill="#3d2520" opacity=".13"/>
+  <rect x="185" y="450" width="330" height="180" rx="28" fill="#b94755"/>
+  <rect x="170" y="398" width="360" height="78" rx="20" fill="#f2cf95"/>
+  <path d="M350 398v232" stroke="#fff4df" stroke-width="24"/>
+  <circle cx="266" cy="265" r="56" fill="#c18d62"/>
+  <circle cx="434" cy="265" r="56" fill="#c18d62"/>
+  <circle cx="350" cy="330" r="126" fill="#d4a071"/>
+  <circle cx="305" cy="318" r="15" fill="#3d2520"/>
+  <circle cx="395" cy="318" r="15" fill="#3d2520"/>
+  <ellipse cx="350" cy="365" rx="46" ry="34" fill="#f0c8a3"/>
+  <circle cx="350" cy="354" r="13" fill="#3d2520"/>
+</svg>

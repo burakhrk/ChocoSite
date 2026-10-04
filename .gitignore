@@ -1,0 +1,5 @@
+node_modules/
+dist/
+*.local
+desktop-check.png
+mobile-check.png

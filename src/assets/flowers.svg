@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 800" role="img" aria-label="Fresh flower gift">
+  <rect width="700" height="800" fill="#f4efe8"/>
+  <ellipse cx="350" cy="656" rx="220" ry="46" fill="#3d2520" opacity=".12"/>
+  <path d="M235 610h230l-24-220H259l-24 220Z" fill="#f2d7b0"/>
+  <path d="M350 602V235" stroke="#6d8d73" stroke-width="16" stroke-linecap="round"/>
+  <path d="M347 415c-74-18-135-78-154-151 78 12 139 62 154 151Z" fill="#6d8d73"/>
+  <path d="M355 462c85-14 149-77 169-155-85 9-151 64-169 155Z" fill="#7f9f79"/>
+  <g>
+    <circle cx="254" cy="240" r="62" fill="#c55161"/>
+    <circle cx="347" cy="190" r="72" fill="#f0b4bf"/>
+    <circle cx="440" cy="251" r="66" fill="#e47f90"/>
+    <circle cx="330" cy="298" r="72" fill="#fff4f5"/>
+    <circle cx="350" cy="252" r="44" fill="#d9a85e"/>
+  </g>
+</svg>

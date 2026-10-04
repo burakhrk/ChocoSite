@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 800" role="img" aria-label="Gift chocolate box">
+  <rect width="700" height="800" fill="#f6eadf"/>
+  <ellipse cx="350" cy="655" rx="230" ry="48" fill="#3d2520" opacity=".15"/>
+  <rect x="130" y="210" width="440" height="420" rx="34" fill="#b94755"/>
+  <rect x="168" y="150" width="364" height="120" rx="28" fill="#f8d7ad"/>
+  <path d="M168 282h364" stroke="#f5e3ca" stroke-width="14"/>
+  <g fill="#4b2d28">
+    <rect x="190" y="332" width="120" height="120" rx="22"/>
+    <rect x="330" y="332" width="120" height="120" rx="22"/>
+    <rect x="190" y="472" width="120" height="120" rx="22"/>
+    <rect x="330" y="472" width="120" height="120" rx="22"/>
+  </g>
+  <g fill="#d9a85e">
+    <circle cx="250" cy="392" r="17"/>
+    <circle cx="390" cy="392" r="17"/>
+    <circle cx="250" cy="532" r="17"/>
+    <circle cx="390" cy="532" r="17"/>
+  </g>
+</svg>

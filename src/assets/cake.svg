@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 800" role="img" aria-label="Celebration cake">
+  <rect width="700" height="800" fill="#fff3e7"/>
+  <ellipse cx="350" cy="650" rx="250" ry="52" fill="#3d2520" opacity=".13"/>
+  <path d="M120 420h460l-42 190H162l-42-190Z" fill="#b94755"/>
+  <rect x="155" y="312" width="390" height="150" rx="42" fill="#ffe4be"/>
+  <path d="M185 314c44-78 286-78 330 0" fill="#f8d3a1"/>
+  <path d="M168 382c45 28 83 28 128 0s83-28 128 0 83 28 128 0" fill="none" stroke="#4b2d28" stroke-width="22" stroke-linecap="round"/>
+  <g fill="#c64e5d">
+    <circle cx="235" cy="395" r="18"/>
+    <circle cx="350" cy="380" r="18"/>
+    <circle cx="465" cy="395" r="18"/>
+  </g>
+</svg>
