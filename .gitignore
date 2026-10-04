@@ -3,3 +3,8 @@ dist/
 *.local
 desktop-check.png
 mobile-check.png
+local-desktop.png
+local-mobile.png
+reference-desktop.png
+reference-mobile.png
+label-check.png

@@ -18,13 +18,13 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import './styles.css';
-import heroChocolate from './assets/hero-chocolate.svg';
 import chocolateBox from './assets/chocolate-box.svg';
 import cake from './assets/cake.svg';
 import flowers from './assets/flowers.svg';
 import balloons from './assets/balloons.svg';
 import teddyGift from './assets/teddy-gift.svg';
 import cheesecake from './assets/cheesecake.svg';
+import chefMascot from './assets/chef-mascot.svg';
 
 const categories = [
   'Sevgiliye Özel',
@@ -205,37 +205,34 @@ function App() {
   return (
     <>
       <header className="site-header">
-        <div className="top-strip">
-          <span>18:00'a kadar verilen siparişlerde aynı gün teslimat</span>
-          <button onClick={() => setTrackingOpen(true)}>
-            <Truck size={16} /> Siparişim Nerede?
-          </button>
-        </div>
-
         <div className="header-main">
-          <button className="icon-button mobile-only" aria-label="Menü" onClick={() => setMenuOpen(true)}>
+          <button className="icon-button menu-button" aria-label="Menü" onClick={() => setMenuOpen(true)}>
             <Menu size={23} />
           </button>
-          <a href="#" className="brand" aria-label="ChocoSite ana sayfa">
-            <span>Choco</span>Site
-          </a>
           <label className="search-box desktop-search">
-            <Search size={18} />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Ne aramıştınız?"
             />
+            <Search size={18} />
           </label>
+          <a href="#" className="brand" aria-label="ChocoSite ana sayfa">
+            <span className="brand-mark">C</span>
+            <span className="brand-text">Choco<br />Site</span>
+          </a>
           <nav className="header-actions" aria-label="Hesap işlemleri">
-            <button className="icon-button desktop-only" aria-label="Ara" onClick={() => setSearchOpen(true)}>
+            <button className="icon-button mobile-search" aria-label="Ara" onClick={() => setSearchOpen(true)}>
               <Search size={21} />
             </button>
-            <button className="icon-button desktop-only" aria-label="Üyelik">
-              <User size={21} />
+            <button className="icon-button desktop-only" aria-label="Sipariş takip" onClick={() => setTrackingOpen(true)}>
+              <Truck size={20} />
             </button>
             <button className="icon-button desktop-only" aria-label="Favoriler">
               <Heart size={21} />
+            </button>
+            <button className="icon-button desktop-only" aria-label="Üyelik">
+              <User size={21} />
             </button>
             <button className="cart-button" onClick={() => setCartOpen(true)} aria-label="Sepet">
               <ShoppingBag size={21} />
@@ -255,34 +252,31 @@ function App() {
 
       <main>
         <section className="hero">
-          <img className="hero-art" src={heroChocolate} alt="" aria-hidden="true" />
-          <div className="hero-copy">
-            <p>Aynı gün teslim kutlama hediyeleri</p>
-            <h1>ChocoSite</h1>
-            <span>
-              Çikolata kutuları, doğum günü pastaları, çiçekler ve balonlar tek bir zarif
-              kutlamada buluşur.
-            </span>
-            <div className="hero-actions">
-              <a href="#products" className="primary-link">
-                Ürünleri İncele <ChevronRight size={18} />
-              </a>
-              <button onClick={() => setTrackingOpen(true)} className="secondary-link">
-                Sipariş Takibi
-              </button>
+          <div className="hero-stage">
+            <img className="mascot" src={chefMascot} alt="ChocoSite şef maskotu" />
+            <div className="speech-bubble">
+              <strong>18:00'a kadar vereceğiniz</strong>
+              <strong>siparişler aynı gün teslim edilir.</strong>
             </div>
-          </div>
-          <div className="delivery-card" aria-label="Teslimat bilgisi">
-            <MapPin size={18} />
-            <strong>İstanbul ve Ankara</strong>
-            <span>Şube seç, WhatsApp ile hızlı destek al.</span>
+            <div className="hero-categories" aria-label="Öne çıkan kategoriler">
+              {[
+                ['Doğum Günü Hediyeleri', cake, 'Doğum Günü'],
+                ['Yeni İş Hediyeleri', chocolateBox, 'Mesleklere Özel'],
+                ['Kurumsal Hediyeler', flowers, 'Tüm Ürünler'],
+              ].map(([label, image, target]) => (
+                <button key={label} onClick={() => setActiveCategory(target)}>
+                  <img src={image} alt="" />
+                  <strong>{label}</strong>
+                  <span>İncele</span>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
         <section className="marquee" aria-label="Marka mesajı">
-          <div>
-            Özenle sevenler ChocoSite gönderiyor · Özenle sevenler ChocoSite gönderiyor ·
-          </div>
+          <div>Özenle sevenler ChocoSite gönderiyor</div>
+          <strong>ChocoSite</strong>
         </section>
 
         <section className="mobile-category-row mobile-only" aria-label="Mobil kategoriler">
@@ -295,9 +289,9 @@ function App() {
 
         <section className="product-section" id="products">
           <div className="section-heading">
-            <div>
-              <p>Popüler seçimler</p>
-              <h2>Çikolata, pasta ve hediye koleksiyonu</h2>
+            <div className="section-ribbon">
+              <img src={balloons} alt="" />
+              <h2>En Çok Satanlar!</h2>
             </div>
             <div className="filter-pills">
               {productCategories.slice(0, 6).map((category) => (
@@ -330,10 +324,12 @@ function App() {
                   <span>{product.category}</span>
                   <h3>{product.name}</h3>
                   <div className="price-row">
-                    <strong>{formatPrice(product.price)}</strong>
                     {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
+                    <strong>{formatPrice(product.price)}</strong>
                   </div>
-                  <button onClick={() => addToCart(product)}>Sepete Ekle</button>
+                  <button className="quick-add" onClick={() => addToCart(product)} aria-label={`${product.name} sepete ekle`}>
+                    <ChevronRight size={18} />
+                  </button>
                 </div>
               </article>
             ))}
