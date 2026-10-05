@@ -173,7 +173,7 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [trackingOpen, setTrackingOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [paletteOpen, setPaletteOpen] = useState(true);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const [palette, setPalette] = useState(readPalette);
 
   useEffect(() => {
