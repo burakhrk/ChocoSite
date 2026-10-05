@@ -685,6 +685,12 @@ function CheckoutPanel({ open, close, cart, total, delivery, setDeliveryField })
     if (open) setStep(1);
   }, [open]);
 
+  useEffect(() => {
+    if (!payments.some((item) => item.id === payment)) {
+      setPayment(payments[0] ? payments[0].id : '');
+    }
+  }, [payments, payment]);
+
   const method = payments.find((item) => item.id === payment) || payments[0];
   const entries = deliveryEntries(delivery);
 

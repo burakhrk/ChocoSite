@@ -280,12 +280,6 @@ const DEFAULT_PAYMENTS = [
     tag: '',
     note: 'Havale bilgileri sipariş onayında WhatsApp üzerinden paylaşılır.',
   },
-  {
-    id: 'cod',
-    label: 'Kapıda Ödeme',
-    tag: '',
-    note: 'Kapıda ödeme yalnızca Denizli içi teslimatlarda geçerlidir.',
-  },
 ];
 
 export const DEFAULT_STATE = {
@@ -315,6 +309,20 @@ const normalizeProduct = (product, index) => {
   };
 };
 
+const normalizePayment = (method, index) => ({
+  id: String((method && method.id) || `method-${index + 1}`),
+  label: String((method && method.label) || 'Ödeme yöntemi'),
+  tag: String((method && method.tag) || ''),
+  note: String((method && method.note) || ''),
+});
+
+const normalizePayments = (value) => {
+  const list = asArray(value, DEFAULT_PAYMENTS)
+    .filter((method) => method && method.id !== 'cod')
+    .map(normalizePayment);
+  return list.length ? list : DEFAULT_PAYMENTS.map(normalizePayment);
+};
+
 export const normalize = (input) => {
   const raw = input && typeof input === 'object' ? input : {};
   return {
@@ -322,7 +330,7 @@ export const normalize = (input) => {
     products: asArray(raw.products, DEFAULT_PRODUCTS).map(normalizeProduct),
     site: { ...DEFAULT_SITE, ...(raw.site || {}) },
     whatsapp: { ...DEFAULT_WHATSAPP, ...(raw.whatsapp || {}) },
-    payments: asArray(raw.payments, DEFAULT_PAYMENTS),
+    payments: normalizePayments(raw.payments),
   };
 };
 
