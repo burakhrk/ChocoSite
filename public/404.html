@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>ChocoSite</title>
+    <script>
+      (function () {
+        var path = window.location.pathname.replace(/\/+$/, '');
+        if (/\/admin$/.test(path)) {
+          var base = path.replace(/admin$/, '');
+          window.location.replace(window.location.origin + base + 'index.html#/admin');
+          return;
+        }
+        document.title = 'Sayfa bulunamadı';
+      })();
+    </script>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #fff4e4;
+        color: #1a120c;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        text-align: center;
+      }
+      a {
+        color: #b3122e;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <p>Sayfa bulunamadı.</p>
+      <p><a href="index.html">ChocoSite ana sayfasına dön</a></p>
+    </div>
+  </body>
+</html>

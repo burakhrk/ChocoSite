@@ -17,148 +17,15 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import './styles.css';
-import chocolateBox from './assets/chocolate-box.svg';
-import cake from './assets/cake.svg';
-import flowers from './assets/flowers.svg';
-import balloons from './assets/balloons.svg';
-import teddyGift from './assets/teddy-gift.svg';
-import cheesecake from './assets/cheesecake.svg';
-import heroChocolate from './assets/hero-chocolate.svg';
-import venedikPhoto from './assets/Images/hd-venedik-01.webp';
-import venedikMiniPhoto from './assets/Images/hd-venedik-mini-01.webp';
-import venedikBirthdayPhoto from './assets/Images/hd-venedik-02.webp';
-import badgeBirthday from './assets/Images/bn-rakun-dogum-gunu-hediyeleri.svg';
-import badgeWorkplace from './assets/Images/bn-rakun-yeni-is-hediyeleri.svg';
-import badgeCorporate from './assets/Images/bn-rakun-kurumsal-hediyeler.svg';
+import { ASSETS, StoreProvider, formatPrice, primaryImage, useStore } from './store.jsx';
+import AdminApp from './admin/AdminApp.jsx';
 
 const WHATSAPP_NUMBER = '905414015262';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 const waLink = (text) => `${WHATSAPP_LINK}?text=${encodeURIComponent(text)}`;
 
-const trackingText = (orderNo) => `Merhaba, siparişim nerede? Sipariş numaram: ${orderNo}`;
-const ORDER_TEXT = 'Merhaba, ChocoSite\'den sipariş vermek istiyorum.';
-const ACCOUNT_TEXT = 'Merhaba, üyelik ve hesap işlemleri hakkında bilgi almak istiyorum.';
-
-const categories = [
-  'Sevgiliye Özel',
-  'Teşekkürler',
-  'İçimden Geldi',
-  'Yeni İş, Tebrik',
-  'Doğum Günü',
-  'Yıl Dönümü',
-  'Özür Dilerim',
-  'Tebrikler!',
-  'Geçmiş Olsun',
-  'Çocuğa Hediyeler',
-  'Hoş Geldin Bebek',
-  'Çiçekler',
-  'Uçan Balon',
-  'Peluş Oyuncak',
-  'Kurumsal',
-  'Mesleklere Özel',
-];
-
-const products = [
-  {
-    id: 1,
-    name: 'Venedik',
-    category: 'Çikolata Kutuları',
-    price: 1749,
-    oldPrice: 1799,
-    badge: '%3 indirim',
-    image: venedikPhoto,
-  },
-  {
-    id: 2,
-    name: 'Venedik Mini',
-    category: 'Hediye Çikolata',
-    price: 1049,
-    oldPrice: 1299,
-    badge: '%19 indirim',
-    image: venedikMiniPhoto,
-  },
-  {
-    id: 3,
-    name: 'Your Majesty',
-    category: 'Çikolata Kutuları',
-    price: 2299,
-    image: chocolateBox,
-  },
-  {
-    id: 4,
-    name: 'HOLA',
-    category: 'Doğum Günü',
-    price: 2745,
-    image: cake,
-  },
-  {
-    id: 5,
-    name: 'JOY Ayıcıklı Kutlama Paketi',
-    category: 'Çocuğa Hediyeler',
-    price: 5490,
-    image: teddyGift,
-  },
-  {
-    id: 6,
-    name: 'Öğretmene Hediye - Chambre',
-    category: 'Mesleklere Özel',
-    price: 1699,
-    oldPrice: 1999,
-    badge: '%15 indirim',
-    image: chocolateBox,
-  },
-  {
-    id: 7,
-    name: 'Mini Venedik Brownie',
-    category: 'Pasta',
-    price: 1049,
-    image: venedikBirthdayPhoto,
-  },
-  {
-    id: 8,
-    name: 'Sirene Tiramisu + Çiçek',
-    category: 'Çiçekler',
-    price: 2698,
-    image: flowers,
-  },
-  {
-    id: 9,
-    name: '6 Cakes',
-    category: 'Doğum Günü',
-    price: 1799,
-    image: cake,
-  },
-  {
-    id: 10,
-    name: 'Venüs, Kalp Balon',
-    category: 'Uçan Balon',
-    price: 2399,
-    image: balloons,
-  },
-  {
-    id: 11,
-    name: 'New York Cheesecake',
-    category: 'Pasta',
-    price: 1899,
-    image: cheesecake,
-  },
-  {
-    id: 12,
-    name: 'Love Bombing',
-    category: 'Sevgiliye Özel',
-    price: 3298,
-    oldPrice: 3699,
-    badge: '%11 indirim',
-    image: chocolateBox,
-  },
-];
-
-const formatPrice = (value) =>
-  new Intl.NumberFormat('tr-TR', {
-    style: 'currency',
-    currency: 'TRY',
-    maximumFractionDigits: 0,
-  }).format(value);
+const trackingText = (orderNo, template) =>
+  String(template || '{SIPARIS_NO}').replace('{SIPARIS_NO}', orderNo);
 
 const deliveryEntries = (delivery) =>
   [
@@ -173,7 +40,7 @@ const deliveryEntries = (delivery) =>
 const deliveryLines = (delivery) =>
   deliveryEntries(delivery).map(([key, value]) => `${key}: ${value.trim()}`);
 
-const cartOrderText = (cart, total, delivery) => {
+const cartOrderText = (cart, total, delivery, intro) => {
   const lines = cart.map(
     (item) => `- ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`,
   );
@@ -181,42 +48,21 @@ const cartOrderText = (cart, total, delivery) => {
     .filter((line) => line.startsWith('Teslimat'))
     .join('\n');
   const tail = details ? `\n\n${details}` : '';
-  return `Merhaba, sipariş vermek istiyorum:\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}${tail}`;
+  return `${intro}\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}${tail}`;
 };
 
-const checkoutOrderText = (cart, total, delivery, paymentLabel) => {
+const checkoutOrderText = (cart, total, delivery, paymentLabel, intro, paymentPrefix) => {
   const lines = cart.map(
     (item) => `- ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`,
   );
   const details = deliveryLines(delivery);
   const blocks = [
-    `Merhaba, sipariş vermek istiyorum:\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}`,
+    `${intro}\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}`,
     details.join('\n'),
-    `Ödeme şekli: ${paymentLabel}`,
+    `${paymentPrefix} ${paymentLabel}`,
   ];
   return blocks.filter(Boolean).join('\n\n');
 };
-
-const PAYMENT_METHODS = [
-  {
-    id: 'card',
-    label: 'Kredi / Banka Kartı',
-    tag: 'Yakında',
-    note: 'Online ödeme altyapısı hazırlanıyor. Bu aşamada siparişiniz WhatsApp üzerinden tamamlanır.',
-  },
-  {
-    id: 'transfer',
-    label: 'Havale / EFT',
-    tag: '',
-    note: 'Havale bilgileri sipariş onayında WhatsApp üzerinden paylaşılır.',
-  },
-  {
-    id: 'cod',
-    label: 'Kapıda Ödeme',
-    tag: '',
-    note: 'Kapıda ödeme yalnızca Denizli içi teslimatlarda geçerlidir.',
-  },
-];
 
 function WhatsAppIcon() {
   return (
@@ -249,19 +95,38 @@ function App() {
   const setDeliveryField = (field, value) =>
     setDelivery((current) => ({ ...current, [field]: value }));
 
-  const productCategories = ['Tüm Ürünler', ...new Set(products.map((product) => product.category))];
+  const { state } = useStore();
+  const site = state.site;
+  const whatsapp = state.whatsapp;
+  const payments = state.payments;
+  const categories = state.categories;
+
+  const products = useMemo(
+    () =>
+      state.products
+        .filter((product) => product.active)
+        .map((product) => ({ ...product, image: primaryImage(product) })),
+    [state.products],
+  );
+
+  const productCategories = [
+    'Tüm Ürünler',
+    ...new Set(products.map((product) => product.categories[0] || '').filter(Boolean)),
+  ];
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesCategory =
-        activeCategory === 'Tüm Ürünler' || product.category === activeCategory || product.name.includes(activeCategory);
-      const matchesQuery = `${product.name} ${product.category}`.toLocaleLowerCase('tr-TR').includes(
-        query.toLocaleLowerCase('tr-TR'),
-      );
+        activeCategory === 'Tüm Ürünler' ||
+        product.categories.includes(activeCategory) ||
+        product.name.includes(activeCategory);
+      const matchesQuery = `${product.name} ${product.categories.join(' ')}`.toLocaleLowerCase(
+        'tr-TR',
+      ).includes(query.toLocaleLowerCase('tr-TR'));
       const matchesFavorites = !favoritesOnly || favoriteIds.includes(product.id);
       return matchesCategory && matchesQuery && matchesFavorites;
     });
-  }, [activeCategory, query, favoritesOnly, favoriteIds]);
+  }, [products, activeCategory, query, favoritesOnly, favoriteIds]);
 
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -347,7 +212,7 @@ function App() {
               className="icon-button desktop-only"
               aria-label="Üyelik ve hesap"
               title="Üyelik ve hesap"
-              onClick={() => window.open(waLink(ACCOUNT_TEXT), '_blank', 'noopener,noreferrer')}
+              onClick={() => window.open(waLink(whatsapp.account), '_blank', 'noopener,noreferrer')}
             >
               <User size={21} />
             </button>
@@ -371,22 +236,21 @@ function App() {
         <section className="hero">
           <div className="hero-stage">
             <div className="hero-copy">
-              <h1>Denizli&apos;ye çikolata, pasta ve kutlama hediyeleri</h1>
-              <span>Siparişler Denizli içi aynı gün teslim edilir.</span>
+              <h1>{site.heroTitle}</h1>
+              <span>{site.heroSubtitle}</span>
             </div>
             <img
               className="hero-illustration"
-              src={heroChocolate}
+              src={ASSETS['hero-chocolate']}
               alt="ChocoSite hediye çikolata kutuları"
             />
             <div className="hero-categories" aria-label="Öne çıkan kategoriler">
-              {[
-                ['Doğum Günü Hediyeleri', badgeBirthday, 'Doğum Günü'],
-                ['Yeni İş Hediyeleri', badgeWorkplace, 'Mesleklere Özel'],
-                ['Kurumsal Hediyeler', badgeCorporate, 'Tüm Ürünler'],
-              ].map(([label, image, target]) => (
-                <button key={label} onClick={() => setActiveCategory(target)}>
-                  <img src={image} alt={label} />
+              {site.heroCards.map((card) => (
+                <button key={card.label} onClick={() => setActiveCategory(card.target)}>
+                  <img
+                    src={card.image.startsWith('asset:') ? ASSETS[card.image.slice(6)] : card.image}
+                    alt={card.label}
+                  />
                 </button>
               ))}
             </div>
@@ -394,7 +258,7 @@ function App() {
         </section>
 
         <section className="marquee" aria-label="Marka mesajı">
-          <div>Denizli&apos;ye özenle ChocoSite gönderiyor</div>
+          <div>{site.marquee}</div>
           <strong>ChocoSite</strong>
         </section>
 
@@ -409,7 +273,7 @@ function App() {
         <section className="product-section" id="products">
           <div className="section-heading">
             <div className="section-ribbon">
-              <h2>En Çok Satanlar!</h2>
+              <h2>{site.sectionTitle}</h2>
             </div>
             <div className="filter-pills">
               {productCategories.slice(0, 6).map((category) => (
@@ -452,8 +316,9 @@ function App() {
                     </button>
                   </div>
                   <div className="product-body">
-                    <span>{product.category}</span>
+                    <span>{product.categories[0] || ''}</span>
                     <h3>{product.name}</h3>
+                    {product.description && <p className="product-desc">{product.description}</p>}
                     <div className="price-row">
                       {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
                       <strong>{formatPrice(product.price)}</strong>
@@ -471,30 +336,24 @@ function App() {
         <section className="content-band" id="about">
           <div className="editorial-image">
             <img
-              src={cake}
+              src={ASSETS.cake}
               alt="Çikolatalı pasta hazırlığı"
               loading="lazy"
             />
           </div>
           <div className="editorial-copy">
-            <p>Doğum günü pastası</p>
-            <h2>Kutlamayı kişisel ve lezzetli yapan detaylar</h2>
-            <span>
-              Özel günlerde pasta, çikolata, çiçek ve balon seçeneklerini birlikte planlayarak
-              unutulmaz bir kutlama hazırlayabilirsiniz. Siparişler yalnızca Denizli içine özel
-              teslimatla adresinize ulaşır; sepet akışı mobilde de tek elle kullanılacak şekilde
-              tasarlandı.
-            </span>
+            <p>{site.aboutKicker}</p>
+            <h2>{site.aboutTitle}</h2>
+            <span>{site.aboutText}</span>
             <div className="feature-list">
-              <span>
-                <Gift size={18} /> Hediye paketleri
-              </span>
-              <span>
-                <Sparkles size={18} /> Kişiye özel not
-              </span>
-              <span>
-                <Truck size={18} /> Denizli içi teslimat
-              </span>
+              {site.aboutFeatures.map((feature, index) => {
+                const FeatureIcon = [Gift, Sparkles, Truck][index] || Sparkles;
+                return (
+                  <span key={index}>
+                    <FeatureIcon size={18} /> {feature}
+                  </span>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -503,30 +362,25 @@ function App() {
       <footer id="contact">
         <div>
           <strong>ChocoSite</strong>
-          <span>Çikolata, pasta ve kutlama hediyeleri. Denizli içi özel teslimat.</span>
+          <span>{site.footerTagline}</span>
         </div>
         <div className="footer-links">
-          <a href="#products">Kategoriler</a>
-          <a href="#products">Kurumsal</a>
-          <a href="#products">Güvenli Alışveriş</a>
-          <a href="#products">İletişim</a>
+          {site.footerLinks.map((link, index) => (
+            <a key={index} href={link.href}>
+              {link.label}
+            </a>
+          ))}
         </div>
         <div className="branch-actions">
-          <a
-            href={waLink('Merhaba, Merkezefendi ilçesine teslimat hakkında bilgi almak istiyorum.')}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <MessageCircle size={17} /> Merkezefendi
-          </a>
-          <a
-            href={waLink('Merhaba, Pamukkale ilçesine teslimat hakkında bilgi almak istiyorum.')}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <MessageCircle size={17} /> Pamukkale
-          </a>
+          {site.branches.map((branch, index) => (
+            <a key={index} href={waLink(branch.text)} target="_blank" rel="noreferrer">
+              <MessageCircle size={17} /> {branch.name}
+            </a>
+          ))}
         </div>
+        <a className="footer-admin" href="#/admin">
+          Yönetim paneli
+        </a>
       </footer>
 
       <SideMenu
@@ -570,10 +424,10 @@ function App() {
 
       <a
         className="whatsapp-fab"
-        href={waLink(ORDER_TEXT)}
+        href={waLink(whatsapp.order)}
         target="_blank"
         rel="noreferrer"
-        aria-label="WhatsApp ile Denizli siparişi ver"
+        aria-label={whatsapp.fabLabel}
       >
         <WhatsAppIcon />
       </a>
@@ -592,6 +446,10 @@ function SideMenu({
   favoriteCount,
   openTracking,
 }) {
+  const { state } = useStore();
+  const site = state.site;
+  const whatsapp = state.whatsapp;
+
   return (
     <div className={`overlay ${open ? 'open' : ''}`} aria-hidden={!open}>
       <button className="scrim" onClick={close} aria-label="Menüyü kapat" />
@@ -607,7 +465,7 @@ function SideMenu({
           <span className="brand-mark">C</span>
           <div>
             <strong>ChocoSite</strong>
-            <span>Denizli içi aynı gün teslimat</span>
+            <span>{site.menuTagline}</span>
           </div>
         </div>
 
@@ -632,7 +490,7 @@ function SideMenu({
           >
             <Truck size={18} /> Sipariş Takibi
           </button>
-          <a className="menu-row" href={waLink(ACCOUNT_TEXT)} target="_blank" rel="noreferrer" onClick={close}>
+          <a className="menu-row" href={waLink(whatsapp.account)} target="_blank" rel="noreferrer" onClick={close}>
             <User size={18} /> Üyelik &amp; Hesap
           </a>
           <a className="menu-row" href="#about" onClick={close}>
@@ -660,10 +518,10 @@ function SideMenu({
         </div>
 
         <div className="menu-foot">
-          <a className="menu-whatsapp" href={waLink(ORDER_TEXT)} target="_blank" rel="noreferrer">
-            <WhatsAppIcon /> WhatsApp&apos;tan sipariş ver
+          <a className="menu-whatsapp" href={waLink(whatsapp.order)} target="_blank" rel="noreferrer">
+            <WhatsAppIcon /> {site.menuWhatsappLabel}
           </a>
-          <span>0541 401 52 62 · Merkezefendi &amp; Pamukkale</span>
+          <span>{site.phone} · {site.menuBranchLine}</span>
         </div>
       </aside>
     </div>
@@ -673,6 +531,9 @@ function SideMenu({
 function TrackingPanel({ open, close }) {
   const [orderNo, setOrderNo] = useState('');
   const inputRef = useRef(null);
+  const { state } = useStore();
+  const site = state.site;
+  const whatsapp = state.whatsapp;
 
   useEffect(() => {
     if (open && inputRef.current) inputRef.current.focus();
@@ -682,7 +543,7 @@ function TrackingPanel({ open, close }) {
     event.preventDefault();
     const value = orderNo.trim();
     if (!value) return;
-    window.open(waLink(trackingText(value)), '_blank', 'noopener,noreferrer');
+    window.open(waLink(trackingText(value, whatsapp.tracking)), '_blank', 'noopener,noreferrer');
     setOrderNo('');
     close();
   };
@@ -698,7 +559,7 @@ function TrackingPanel({ open, close }) {
           </button>
         </div>
         <p className="track-hint">
-          Durumu öğrenmek için sipariş numaranızı girin. Mesajınız WhatsApp&apos;ta hazır şekilde açılacak.
+          {site.trackHint}
         </p>
         <form className="track-form" onSubmit={submit}>
           <label htmlFor="order-no">Sipariş numaranız</label>
@@ -707,15 +568,15 @@ function TrackingPanel({ open, close }) {
             ref={inputRef}
             value={orderNo}
             onChange={(event) => setOrderNo(event.target.value)}
-            placeholder="Örn. CS-1024"
+            placeholder={site.trackPlaceholder}
             autoComplete="off"
           />
           <button type="submit" disabled={!orderNo.trim()}>
-            WhatsApp&apos;tan sorgula
+            {site.trackButton}
           </button>
         </form>
         <div className="track-meta">
-          <MapPin size={16} /> Denizli içi aynı gün teslimat
+          <MapPin size={16} /> {site.trackMeta}
         </div>
       </aside>
     </div>
@@ -723,6 +584,9 @@ function TrackingPanel({ open, close }) {
 }
 
 function CartDrawer({ open, close, cart, total, updateQuantity, delivery, setDeliveryField, openCheckout }) {
+  const { state } = useStore();
+  const whatsapp = state.whatsapp;
+
   return (
     <div className={`overlay ${open ? 'open' : ''}`} aria-hidden={!open}>
       <button className="scrim" onClick={close} aria-label="Sepeti kapat" />
@@ -798,7 +662,7 @@ function CartDrawer({ open, close, cart, total, updateQuantity, delivery, setDel
                 >
                   Ödemeye geç
                 </button>
-                <a href={waLink(cartOrderText(cart, total, delivery))} target="_blank" rel="noreferrer">
+                <a href={waLink(cartOrderText(cart, total, delivery, whatsapp.cartIntro))} target="_blank" rel="noreferrer">
                   <WhatsAppIcon /> WhatsApp ile sipariş ver
                 </a>
               </div>
@@ -813,12 +677,15 @@ function CartDrawer({ open, close, cart, total, updateQuantity, delivery, setDel
 function CheckoutPanel({ open, close, cart, total, delivery, setDeliveryField }) {
   const [step, setStep] = useState(1);
   const [payment, setPayment] = useState('card');
+  const { state } = useStore();
+  const payments = state.payments;
+  const whatsapp = state.whatsapp;
 
   useEffect(() => {
     if (open) setStep(1);
   }, [open]);
 
-  const method = PAYMENT_METHODS.find((item) => item.id === payment) || PAYMENT_METHODS[0];
+  const method = payments.find((item) => item.id === payment) || payments[0];
   const entries = deliveryEntries(delivery);
 
   return (
@@ -920,7 +787,7 @@ function CheckoutPanel({ open, close, cart, total, delivery, setDeliveryField })
         {step === 2 && (
           <div className="checkout-step">
             <div className="pay-options">
-              {PAYMENT_METHODS.map((item) => (
+              {payments.map((item) => (
                 <label key={item.id} className={`pay-option ${payment === item.id ? 'active' : ''}`}>
                   <input
                     type="radio"
@@ -1013,7 +880,7 @@ function CheckoutPanel({ open, close, cart, total, delivery, setDeliveryField })
 
             <a
               className="checkout-submit"
-              href={waLink(checkoutOrderText(cart, total, delivery, method.label))}
+              href={waLink(checkoutOrderText(cart, total, delivery, method.label, whatsapp.cartIntro, whatsapp.paymentPrefix))}
               target="_blank"
               rel="noreferrer"
             >
@@ -1071,4 +938,33 @@ function SearchOverlay({ open, close, query, setQuery, products, addToCart }) {
   );
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+const SHOP_TITLE = document.title;
+
+const isAdminRoute = () => {
+  const path = window.location.pathname.replace(/\/+$/, '');
+  if (path.endsWith('/admin')) return true;
+  return window.location.hash.startsWith('#/admin');
+};
+
+function Root() {
+  const [admin, setAdmin] = useState(isAdminRoute);
+
+  useEffect(() => {
+    const sync = () => setAdmin(isAdminRoute());
+    window.addEventListener('hashchange', sync);
+    window.addEventListener('popstate', sync);
+    return () => {
+      window.removeEventListener('hashchange', sync);
+      window.removeEventListener('popstate', sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.title = admin ? 'ChocoSite Yönetim' : SHOP_TITLE;
+    if (admin) window.scrollTo(0, 0);
+  }, [admin]);
+
+  return <StoreProvider>{admin ? <AdminApp /> : <App />}</StoreProvider>;
+}
+
+createRoot(document.getElementById('root')).render(<Root />);
