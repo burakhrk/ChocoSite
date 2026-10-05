@@ -552,58 +552,13 @@ function CartDrawer({ open, close, cart, total, updateQuantity }) {
             <div className="cart-summary">
               <span>Ara toplam</span>
               <strong>{formatPrice(total)}</strong>
-              <button>Sepeti Gör</button>
+              <a href={waLink(cartOrderText(cart, total))} target="_blank" rel="noreferrer">
+                WhatsApp ile sipariş ver
+              </a>
             </div>
           </>
         )}
       </aside>
-    </div>
-  );
-}
-
-function TrackingModal({ open, close }) {
-  const [answer, setAnswer] = useState('');
-  const [captcha, setCaptcha] = useState('7 + 4');
-  const [message, setMessage] = useState('');
-
-  const refreshCaptcha = () => {
-    const left = Math.ceil(Math.random() * 8);
-    const right = Math.ceil(Math.random() * 8);
-    setCaptcha(`${left} + ${right}`);
-    setAnswer('');
-  };
-
-  const submit = (event) => {
-    event.preventDefault();
-    setMessage('Demo sipariş takibi hazır. Gerçek mağaza API bağlantısı eklendiğinde sonuç burada görünür.');
-  };
-
-  return (
-    <div className={`modal-layer ${open ? 'open' : ''}`} aria-hidden={!open}>
-      <button className="modal-scrim" onClick={close} aria-label="Kapat" />
-      <section className="tracking-modal" role="dialog" aria-modal="true" aria-labelledby="tracking-title">
-        <div className="panel-header">
-          <strong id="tracking-title">Siparişim Nerede?</strong>
-          <button className="icon-button" onClick={close} aria-label="Kapat">
-            <X size={21} />
-          </button>
-        </div>
-        <p>Vermiş olduğunuz siparişi aşağıdaki kısa formu doldurarak takip edebilirsiniz.</p>
-        <form onSubmit={submit}>
-          <input required placeholder="Sipariş Numaranız" />
-          <input required type="email" placeholder="E-posta Adresiniz" />
-          <div className="captcha-row">
-            <span>{captcha}</span>
-            <button type="button" onClick={refreshCaptcha} aria-label="Güvenlik sorusunu yenile">
-              <RotateCcw size={17} />
-            </button>
-            <input required value={answer} onChange={(event) => setAnswer(event.target.value)} placeholder="Cevap" />
-          </div>
-          <small>Güvenlik için 15 dakikada en fazla 5 sipariş sorgulayabilirsiniz.</small>
-          <button type="submit">Sorgula</button>
-        </form>
-        {message && <div className="form-message">{message}</div>}
-      </section>
     </div>
   );
 }

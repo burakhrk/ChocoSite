@@ -527,7 +527,7 @@ footer {
 .product-body button,
 .empty-cart button,
 .cart-summary button,
-.tracking-modal form > button {
+.cart-summary a {
   min-height: 44px;
   border: 0;
   border-radius: 999px;
@@ -623,7 +623,6 @@ footer strong {
 }
 
 .overlay,
-.modal-layer,
 .search-overlay {
   position: fixed;
   inset: 0;
@@ -633,14 +632,12 @@ footer strong {
 }
 
 .overlay.open,
-.modal-layer.open,
 .search-overlay.open {
   pointer-events: auto;
   visibility: visible;
 }
 
-.scrim,
-.modal-scrim {
+.scrim {
   position: absolute;
   inset: 0;
   border: 0;
@@ -649,8 +646,7 @@ footer strong {
   transition: opacity 0.22s ease;
 }
 
-.open .scrim,
-.open .modal-scrim {
+.open .scrim {
   opacity: 1;
 }
 
@@ -793,80 +789,10 @@ footer strong {
   border-top: 1px solid var(--line);
 }
 
-.cart-summary button {
+.cart-summary button,
+.cart-summary a {
   grid-column: 1 / -1;
-}
-
-.tracking-modal {
-  position: relative;
-  width: min(520px, calc(100% - 28px));
-  margin: min(10vh, 64px) auto;
-  padding: 22px;
-  background: var(--paper);
-  border-radius: 8px;
-  box-shadow: 0 20px 70px rgba(37, 27, 23, 0.22);
-  transform: translateY(14px);
-  opacity: 0;
-  transition:
-    transform 0.25s ease,
-    opacity 0.25s ease;
-}
-
-.open .tracking-modal {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.tracking-modal p,
-.tracking-modal small {
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.tracking-modal form {
-  display: grid;
-  gap: 12px;
-}
-
-.tracking-modal input {
-  width: 100%;
-  min-height: 44px;
-  padding: 0 13px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--pv-cream-2);
-  outline: 0;
-}
-
-.captcha-row {
-  display: grid;
-  grid-template-columns: auto 42px 1fr;
-  gap: 8px;
-  align-items: center;
-}
-
-.captcha-row span,
-.captcha-row button {
-  min-height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--pv-cream-2);
-  border: 1px solid var(--line);
-}
-
-.captcha-row span {
-  min-width: 80px;
-  font-weight: 800;
-}
-
-.form-message {
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid var(--pv-ok-line);
-  border-radius: 8px;
-  background: var(--pv-ok-bg);
-  color: var(--pv-ok-ink);
+  text-align: center;
 }
 
 .search-overlay {
@@ -1084,14 +1010,6 @@ footer strong {
 
   .price-row strong {
     font-size: 16px;
-  }
-
-  .captcha-row {
-    grid-template-columns: 1fr 42px;
-  }
-
-  .captcha-row input {
-    grid-column: 1 / -1;
   }
 
   .search-results button {
