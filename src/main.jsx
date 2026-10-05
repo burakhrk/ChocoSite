@@ -302,7 +302,7 @@ function App() {
           <div className="hero-stage">
             <div className="hero-copy">
               <h1>Denizli&apos;ye çikolata, pasta ve kutlama hediyeleri</h1>
-              <span>18:00&apos;a kadar verdiğiniz siparişler Denizli içi aynı gün teslim edilir.</span>
+              <span>Siparişler Denizli içi aynı gün teslim edilir.</span>
             </div>
             <img
               className="hero-illustration"
