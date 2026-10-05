@@ -24,7 +24,7 @@ import flowers from './assets/flowers.svg';
 import balloons from './assets/balloons.svg';
 import teddyGift from './assets/teddy-gift.svg';
 import cheesecake from './assets/cheesecake.svg';
-import chefMascot from './assets/chef-mascot.svg';
+import heroChocolate from './assets/hero-chocolate.svg';
 
 const categories = [
   'Sevgiliye Özel',
@@ -281,11 +281,15 @@ function App() {
       <main>
         <section className="hero">
           <div className="hero-stage">
-            <img className="mascot" src={chefMascot} alt="ChocoSite şef maskotu" />
-            <div className="speech-bubble">
-              <strong>18:00'a kadar vereceğiniz</strong>
-              <strong>siparişler aynı gün teslim edilir.</strong>
+            <div className="hero-copy">
+              <h1>Çikolata, pasta ve kutlama hediyeleri</h1>
+              <span>18:00&apos;a kadar verdiğiniz siparişler aynı gün teslim edilir.</span>
             </div>
+            <img
+              className="hero-illustration"
+              src={heroChocolate}
+              alt="ChocoSite hediye çikolata kutuları"
+            />
             <div className="hero-categories" aria-label="Öne çıkan kategoriler">
               {[
                 ['Doğum Günü Hediyeleri', cake, 'Doğum Günü'],
@@ -295,7 +299,7 @@ function App() {
                 <button key={label} onClick={() => setActiveCategory(target)}>
                   <img src={image} alt="" />
                   <strong>{label}</strong>
-                  <span>İncele</span>
+                  <ChevronRight size={17} aria-hidden="true" />
                 </button>
               ))}
             </div>
@@ -318,7 +322,6 @@ function App() {
         <section className="product-section" id="products">
           <div className="section-heading">
             <div className="section-ribbon">
-              <img src={balloons} alt="" />
               <h2>En Çok Satanlar!</h2>
             </div>
             <div className="filter-pills">
