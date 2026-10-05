@@ -1446,7 +1446,8 @@ body {
   justify-content: center;
   min-height: 38px;
   padding: 0;
-  overflow: visible;
+  overflow-x: clip;
+  overflow-y: visible;
   color: var(--pv-ink);
   background: var(--pv-band);
   border-block: 3px solid var(--pv-ink);
@@ -1849,6 +1850,13 @@ footer strong {
 
   .product-body h3 {
     font-size: 18px;
+  }
+}
+
+/* Editorial band must stack before its min columns stop fitting */
+@media (max-width: 700px) {
+  .content-band {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
