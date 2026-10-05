@@ -1326,50 +1326,41 @@ body {
 .hero-categories {
   grid-area: cats;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  max-width: 660px;
+  justify-self: center;
+  gap: clamp(10px, 2vw, 20px);
   align-items: stretch;
 }
 
 .hero-categories button {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
+  place-items: center;
   min-width: 0;
-  padding: 12px 16px;
-  background: var(--pv-cream);
-  border: 2px solid var(--pv-ink);
-  border-radius: 8px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
   color: var(--pv-ink);
-  text-align: left;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.18s ease, filter 0.18s ease;
 }
 
 .hero-categories button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
+}
+
+.hero-categories button:focus-visible {
+  outline: 3px solid var(--pv-band);
+  outline-offset: 4px;
 }
 
 .hero-categories img {
-  width: 40px;
-  height: 34px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
   object-fit: contain;
-}
-
-.hero-categories strong {
-  min-width: 0;
-  color: var(--pv-ink);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(16px, 1.4vw, 19px);
-  font-weight: 500;
-  line-height: 1.15;
-  text-wrap: balance;
-}
-
-.hero-categories svg {
-  color: var(--pv-hot-ink);
-  stroke-width: 2.5;
 }
 
 .marquee {
@@ -1401,7 +1392,7 @@ body {
 }
 
 .marquee div::after {
-  content: "  Özenle sevenler ChocoSite gönderiyor  Özenle sevenler ChocoSite gönderiyor  Özenle sevenler ChocoSite gönderiyor";
+  content: "  Denizli'ye özenle ChocoSite gönderiyor  Denizli'ye özenle ChocoSite gönderiyor  Denizli'ye özenle ChocoSite gönderiyor";
 }
 
 .marquee strong {
@@ -1683,22 +1674,7 @@ footer strong {
   }
 
   .hero-categories {
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
     gap: 10px;
-  }
-
-  .hero-categories button {
-    padding: 11px 14px;
-    gap: 10px;
-  }
-
-  .hero-categories img {
-    width: 32px;
-    height: 28px;
-  }
-
-  .hero-categories strong {
-    font-size: 16px;
   }
 
   .marquee strong {
@@ -1803,6 +1779,38 @@ footer strong {
   margin-right: 0;
 }
 
+/* Floating WhatsApp contact */
+.whatsapp-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  color: #fff;
+  background: #18a957;
+  border: 2px solid var(--pv-ink);
+  border-radius: 50%;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s ease;
+}
+
+.whatsapp-fab:hover {
+  transform: translateY(-3px);
+}
+
+.whatsapp-fab:focus-visible {
+  outline: 3px solid var(--pv-band);
+  outline-offset: 3px;
+}
+
+.whatsapp-fab svg {
+  width: 28px;
+  height: 28px;
+}
+
 @media (max-width: 540px) {
   .palette-dock {
     left: 10px;
@@ -1811,5 +1819,17 @@ footer strong {
 
   .palette-menu button {
     font-size: 12px;
+  }
+
+  .whatsapp-fab {
+    right: 10px;
+    bottom: 10px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .whatsapp-fab svg {
+    width: 25px;
+    height: 25px;
   }
 }
