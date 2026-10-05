@@ -1557,6 +1557,13 @@ footer strong {
   .product-body h3 {
     font-size: 18px;
   }
+
+  .footer-links a,
+  .branch-actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 /* Editorial band must stack before its min columns stop fitting */
