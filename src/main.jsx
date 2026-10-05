@@ -15,7 +15,6 @@ import {
   Sparkles,
   ChevronRight,
   MessageCircle,
-  RotateCcw,
 } from 'lucide-react';
 import './styles.css';
 import chocolateBox from './assets/chocolate-box.svg';
@@ -34,6 +33,10 @@ import badgeCorporate from './assets/Images/bn-rakun-kurumsal-hediyeler.svg';
 
 const WHATSAPP_NUMBER = '905414015262';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
+const waLink = (text) => `${WHATSAPP_LINK}?text=${encodeURIComponent(text)}`;
+
+const TRACKING_TEXT = 'Merhaba, siparişim nerede? Sipariş numaram: ';
+const ORDER_TEXT = 'Merhaba, ChocoSite\'den sipariş vermek istiyorum.';
 
 const categories = [
   'Sevgiliye Özel',
@@ -156,6 +159,13 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const cartOrderText = (cart, total) => {
+  const lines = cart.map(
+    (item) => `- ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`,
+  );
+  return `Merhaba, sipariş vermek istiyorum:\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}`;
+};
+
 function WhatsAppIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
@@ -171,7 +181,6 @@ function App() {
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [trackingOpen, setTrackingOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
   const productCategories = ['Tüm Ürünler', ...new Set(products.map((product) => product.category))];
@@ -242,9 +251,15 @@ function App() {
             <button className="icon-button mobile-search" aria-label="Ara" onClick={() => setSearchOpen(true)}>
               <Search size={21} />
             </button>
-            <button className="icon-button desktop-only" aria-label="Sipariş takip" onClick={() => setTrackingOpen(true)}>
+            <a
+              className="icon-button desktop-only"
+              aria-label="Sipariş takibi - WhatsApp"
+              href={waLink(TRACKING_TEXT)}
+              target="_blank"
+              rel="noreferrer"
+            >
               <Truck size={20} />
-            </button>
+            </a>
             <button className="icon-button desktop-only" aria-label="Favoriler">
               <Heart size={21} />
             </button>
@@ -398,10 +413,18 @@ function App() {
           <a href="#products">İletişim</a>
         </div>
         <div className="branch-actions">
-          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
+          <a
+            href={waLink('Merhaba, Merkezefendi ilçesine teslimat hakkında bilgi almak istiyorum.')}
+            target="_blank"
+            rel="noreferrer"
+          >
             <MessageCircle size={17} /> Merkezefendi
           </a>
-          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
+          <a
+            href={waLink('Merhaba, Pamukkale ilçesine teslimat hakkında bilgi almak istiyorum.')}
+            target="_blank"
+            rel="noreferrer"
+          >
             <MessageCircle size={17} /> Pamukkale
           </a>
         </div>
@@ -412,7 +435,6 @@ function App() {
         close={() => setMenuOpen(false)}
         categories={categories}
         setActiveCategory={setActiveCategory}
-        openTracking={() => setTrackingOpen(true)}
       />
       <CartDrawer
         open={cartOpen}
@@ -421,7 +443,6 @@ function App() {
         total={cartTotal}
         updateQuantity={updateQuantity}
       />
-      <TrackingModal open={trackingOpen} close={() => setTrackingOpen(false)} />
       <SearchOverlay
         open={searchOpen}
         close={() => setSearchOpen(false)}
@@ -433,7 +454,7 @@ function App() {
 
       <a
         className="whatsapp-fab"
-        href={WHATSAPP_LINK}
+        href={waLink(ORDER_TEXT)}
         target="_blank"
         rel="noreferrer"
         aria-label="WhatsApp ile Denizli siparişi ver"
@@ -444,7 +465,7 @@ function App() {
   );
 }
 
-function SideMenu({ open, close, categories, setActiveCategory, openTracking }) {
+function SideMenu({ open, close, categories, setActiveCategory }) {
   return (
     <div className={`overlay ${open ? 'open' : ''}`} aria-hidden={!open}>
       <aside className="side-panel left">
@@ -460,15 +481,15 @@ function SideMenu({ open, close, categories, setActiveCategory, openTracking }) 
         <button className="menu-row">
           <Heart size={18} /> Favorilerim
         </button>
-        <button
+        <a
           className="menu-row"
-          onClick={() => {
-            close();
-            openTracking();
-          }}
+          href={waLink(TRACKING_TEXT)}
+          target="_blank"
+          rel="noreferrer"
+          onClick={close}
         >
           <Truck size={18} /> Sipariş Takibi
-        </button>
+        </a>
         <div className="menu-categories">
           <span>Kategoriler</span>
           {categories.map((category) => (
