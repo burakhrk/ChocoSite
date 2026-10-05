@@ -8,6 +8,12 @@
       content="Aynı gün teslimatlı çikolata, pasta, çiçek ve kutlama hediyeleri."
     />
     <title>ChocoSite | Çikolata ve Kutlama Hediyeleri</title>
+    <script>
+      try {
+        var palette = localStorage.getItem('chocosite-palette');
+        if (palette) document.documentElement.dataset.palette = palette;
+      } catch (error) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
