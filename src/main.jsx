@@ -160,12 +160,63 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const cartOrderText = (cart, total) => {
+const deliveryEntries = (delivery) =>
+  [
+    ['Teslimat yeri', delivery.place],
+    ['Teslimat saati', delivery.time],
+    ['Ad Soyad', delivery.name],
+    ['Telefon', delivery.phone],
+    ['Adres', delivery.address],
+    ['Not', delivery.note],
+  ].filter(([, value]) => value && value.trim());
+
+const deliveryLines = (delivery) =>
+  deliveryEntries(delivery).map(([key, value]) => `${key}: ${value.trim()}`);
+
+const cartOrderText = (cart, total, delivery) => {
   const lines = cart.map(
     (item) => `- ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`,
   );
-  return `Merhaba, sipariş vermek istiyorum:\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}`;
+  const details = deliveryLines(delivery)
+    .filter((line) => line.startsWith('Teslimat'))
+    .join('\n');
+  const tail = details ? `\n\n${details}` : '';
+  return `Merhaba, sipariş vermek istiyorum:\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}${tail}`;
 };
+
+const checkoutOrderText = (cart, total, delivery, paymentLabel) => {
+  const lines = cart.map(
+    (item) => `- ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`,
+  );
+  const details = deliveryLines(delivery);
+  const blocks = [
+    `Merhaba, sipariş vermek istiyorum:\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}`,
+    details.join('\n'),
+    `Ödeme şekli: ${paymentLabel}`,
+  ];
+  return blocks.filter(Boolean).join('\n\n');
+};
+
+const PAYMENT_METHODS = [
+  {
+    id: 'card',
+    label: 'Kredi / Banka Kartı',
+    tag: 'Yakında',
+    note: 'Online ödeme altyapısı hazırlanıyor. Bu aşamada siparişiniz WhatsApp üzerinden tamamlanır.',
+  },
+  {
+    id: 'transfer',
+    label: 'Havale / EFT',
+    tag: '',
+    note: 'Havale bilgileri sipariş onayında WhatsApp üzerinden paylaşılır.',
+  },
+  {
+    id: 'cod',
+    label: 'Kapıda Ödeme',
+    tag: '',
+    note: 'Kapıda ödeme yalnızca Denizli içi teslimatlarda geçerlidir.',
+  },
+];
 
 function WhatsAppIcon() {
   return (
@@ -185,6 +236,18 @@ function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [trackingOpen, setTrackingOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [delivery, setDelivery] = useState({
+    place: '',
+    time: '',
+    name: '',
+    phone: '',
+    address: '',
+    note: '',
+  });
+
+  const setDeliveryField = (field, value) =>
+    setDelivery((current) => ({ ...current, [field]: value }));
 
   const productCategories = ['Tüm Ürünler', ...new Set(products.map((product) => product.category))];
 
@@ -483,8 +546,19 @@ function App() {
         cart={cart}
         total={cartTotal}
         updateQuantity={updateQuantity}
+        delivery={delivery}
+        setDeliveryField={setDeliveryField}
+        openCheckout={() => setCheckoutOpen(true)}
       />
       <TrackingPanel open={trackingOpen} close={() => setTrackingOpen(false)} />
+      <CheckoutPanel
+        open={checkoutOpen}
+        close={() => setCheckoutOpen(false)}
+        cart={cart}
+        total={cartTotal}
+        delivery={delivery}
+        setDeliveryField={setDeliveryField}
+      />
       <SearchOverlay
         open={searchOpen}
         close={() => setSearchOpen(false)}
@@ -648,7 +722,7 @@ function TrackingPanel({ open, close }) {
   );
 }
 
-function CartDrawer({ open, close, cart, total, updateQuantity }) {
+function CartDrawer({ open, close, cart, total, updateQuantity, delivery, setDeliveryField, openCheckout }) {
   return (
     <div className={`overlay ${open ? 'open' : ''}`} aria-hidden={!open}>
       <button className="scrim" onClick={close} aria-label="Sepeti kapat" />
@@ -687,12 +761,47 @@ function CartDrawer({ open, close, cart, total, updateQuantity }) {
                 </div>
               ))}
             </div>
+
+            <div className="cart-form">
+              <span className="cart-form-title">Teslimat bilgileri · opsiyonel</span>
+              <div className="cart-form-row">
+                <label className="field">
+                  <span>Yer</span>
+                  <input
+                    value={delivery.place}
+                    onChange={(event) => setDeliveryField('place', event.target.value)}
+                    placeholder="İlçe / mahalle"
+                    autoComplete="off"
+                  />
+                </label>
+                <label className="field">
+                  <span>Saat</span>
+                  <input
+                    type="time"
+                    value={delivery.time}
+                    onChange={(event) => setDeliveryField('time', event.target.value)}
+                  />
+                </label>
+              </div>
+            </div>
+
             <div className="cart-summary">
               <span>Ara toplam</span>
               <strong>{formatPrice(total)}</strong>
-              <a href={waLink(cartOrderText(cart, total))} target="_blank" rel="noreferrer">
-                WhatsApp ile sipariş ver
-              </a>
+              <div className="cart-cta">
+                <button
+                  type="button"
+                  onClick={() => {
+                    close();
+                    openCheckout();
+                  }}
+                >
+                  Ödemeye geç
+                </button>
+                <a href={waLink(cartOrderText(cart, total, delivery))} target="_blank" rel="noreferrer">
+                  <WhatsAppIcon /> WhatsApp ile sipariş ver
+                </a>
+              </div>
             </div>
           </>
         )}
