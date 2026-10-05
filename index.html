@@ -10,7 +10,8 @@
     <title>ChocoSite | Çikolata ve Kutlama Hediyeleri</title>
     <script>
       try {
-        var palette = localStorage.getItem('chocosite-palette');
+        var fromUrl = new URLSearchParams(location.search).get('palette');
+        var palette = fromUrl || localStorage.getItem('chocosite-palette');
         if (palette) document.documentElement.dataset.palette = palette;
       } catch (error) {}
     </script>

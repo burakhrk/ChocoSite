@@ -149,6 +149,8 @@ const PALETTES = [
 
 const readPalette = () => {
   try {
+    const fromUrl = new URLSearchParams(window.location.search).get('palette');
+    if (fromUrl) return fromUrl;
     return localStorage.getItem('chocosite-palette') || 'cocoa-butter';
   } catch {
     return 'cocoa-butter';
