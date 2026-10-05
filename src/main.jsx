@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   Heart,
@@ -35,8 +35,9 @@ const WHATSAPP_NUMBER = '905414015262';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 const waLink = (text) => `${WHATSAPP_LINK}?text=${encodeURIComponent(text)}`;
 
-const TRACKING_TEXT = 'Merhaba, siparişim nerede? Sipariş numaram: ';
+const trackingText = (orderNo) => `Merhaba, siparişim nerede? Sipariş numaram: ${orderNo}`;
 const ORDER_TEXT = 'Merhaba, ChocoSite\'den sipariş vermek istiyorum.';
+const ACCOUNT_TEXT = 'Merhaba, üyelik ve hesap işlemleri hakkında bilgi almak istiyorum.';
 
 const categories = [
   'Sevgiliye Özel',
@@ -182,6 +183,8 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [trackingOpen, setTrackingOpen] = useState(false);
 
   const productCategories = ['Tüm Ürünler', ...new Set(products.map((product) => product.category))];
 
@@ -192,9 +195,10 @@ function App() {
       const matchesQuery = `${product.name} ${product.category}`.toLocaleLowerCase('tr-TR').includes(
         query.toLocaleLowerCase('tr-TR'),
       );
-      return matchesCategory && matchesQuery;
+      const matchesFavorites = !favoritesOnly || favoriteIds.includes(product.id);
+      return matchesCategory && matchesQuery && matchesFavorites;
     });
-  }, [activeCategory, query]);
+  }, [activeCategory, query, favoritesOnly, favoriteIds]);
 
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -228,6 +232,14 @@ function App() {
     );
   };
 
+  const toggleFavoritesOnly = () => setFavoritesOnly((value) => !value);
+
+  const clearFilters = () => {
+    setFavoritesOnly(false);
+    setActiveCategory('Tüm Ürünler');
+    setQuery('');
+  };
+
   return (
     <>
       <header className="site-header">
@@ -251,19 +263,29 @@ function App() {
             <button className="icon-button mobile-search" aria-label="Ara" onClick={() => setSearchOpen(true)}>
               <Search size={21} />
             </button>
-            <a
+            <button
               className="icon-button desktop-only"
-              aria-label="Sipariş takibi - WhatsApp"
-              href={waLink(TRACKING_TEXT)}
-              target="_blank"
-              rel="noreferrer"
+              aria-label="Sipariş takibi"
+              title="Sipariş takibi"
+              onClick={() => setTrackingOpen(true)}
             >
               <Truck size={20} />
-            </a>
-            <button className="icon-button desktop-only" aria-label="Favoriler">
+            </button>
+            <button
+              className={`icon-button desktop-only ${favoritesOnly ? 'active' : ''}`}
+              aria-label="Favorilerim"
+              aria-pressed={favoritesOnly}
+              title="Favorilerim"
+              onClick={toggleFavoritesOnly}
+            >
               <Heart size={21} />
             </button>
-            <button className="icon-button desktop-only" aria-label="Üyelik">
+            <button
+              className="icon-button desktop-only"
+              aria-label="Üyelik ve hesap"
+              title="Üyelik ve hesap"
+              onClick={() => window.open(waLink(ACCOUNT_TEXT), '_blank', 'noopener,noreferrer')}
+            >
               <User size={21} />
             </button>
             <button className="cart-button" onClick={() => setCartOpen(true)} aria-label="Sepet">
@@ -339,37 +361,51 @@ function App() {
             </div>
           </div>
 
-          <div className="product-grid">
-            {filteredProducts.map((product) => (
-              <article className="product-card" key={product.id}>
-                <div className="product-media">
-                  <img src={product.image} alt={product.name} loading="lazy" />
-                  {product.badge && <span className="badge">{product.badge}</span>}
-                  <button
-                    className={`favorite-button ${favoriteIds.includes(product.id) ? 'active' : ''}`}
-                    aria-label={`${product.name} favorilere ekle`}
-                    onClick={() => toggleFavorite(product.id)}
-                  >
-                    <Heart size={18} />
-                  </button>
-                </div>
-                <div className="product-body">
-                  <span>{product.category}</span>
-                  <h3>{product.name}</h3>
-                  <div className="price-row">
-                    {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
-                    <strong>{formatPrice(product.price)}</strong>
+          {filteredProducts.length === 0 ? (
+            <div className="empty-products">
+              <Heart size={34} />
+              <p>
+                {favoritesOnly && favoriteIds.length === 0
+                  ? 'Henüz favori ürününüz yok. Kalp simgesine dokunarak ürün ekleyin.'
+                  : 'Bu filtreyle eşleşen ürün bulunamadı.'}
+              </p>
+              <button onClick={clearFilters}>
+                {favoritesOnly && favoriteIds.length === 0 ? 'Tüm ürünleri göster' : 'Filtreleri temizle'}
+              </button>
+            </div>
+          ) : (
+            <div className="product-grid">
+              {filteredProducts.map((product) => (
+                <article className="product-card" key={product.id}>
+                  <div className="product-media">
+                    <img src={product.image} alt={product.name} loading="lazy" />
+                    {product.badge && <span className="badge">{product.badge}</span>}
+                    <button
+                      className={`favorite-button ${favoriteIds.includes(product.id) ? 'active' : ''}`}
+                      aria-label={`${product.name} favorilere ${favoriteIds.includes(product.id) ? 'çıkar' : 'ekle'}`}
+                      onClick={() => toggleFavorite(product.id)}
+                    >
+                      <Heart size={18} />
+                    </button>
                   </div>
-                  <button className="quick-add" onClick={() => addToCart(product)} aria-label={`${product.name} sepete ekle`}>
-                    <ChevronRight size={18} />
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div className="product-body">
+                    <span>{product.category}</span>
+                    <h3>{product.name}</h3>
+                    <div className="price-row">
+                      {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
+                      <strong>{formatPrice(product.price)}</strong>
+                    </div>
+                    <button className="quick-add" onClick={() => addToCart(product)} aria-label={`${product.name} sepete ekle`}>
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
-        <section className="content-band">
+        <section className="content-band" id="about">
           <div className="editorial-image">
             <img
               src={cake}
@@ -401,7 +437,7 @@ function App() {
         </section>
       </main>
 
-      <footer>
+      <footer id="contact">
         <div>
           <strong>ChocoSite</strong>
           <span>Çikolata, pasta ve kutlama hediyeleri. Denizli içi özel teslimat.</span>
@@ -434,7 +470,12 @@ function App() {
         open={menuOpen}
         close={() => setMenuOpen(false)}
         categories={categories}
+        activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
+        favoritesOnly={favoritesOnly}
+        toggleFavoritesOnly={toggleFavoritesOnly}
+        favoriteCount={favoriteIds.length}
+        openTracking={() => setTrackingOpen(true)}
       />
       <CartDrawer
         open={cartOpen}
@@ -443,6 +484,7 @@ function App() {
         total={cartTotal}
         updateQuantity={updateQuantity}
       />
+      <TrackingPanel open={trackingOpen} close={() => setTrackingOpen(false)} />
       <SearchOverlay
         open={searchOpen}
         close={() => setSearchOpen(false)}
@@ -465,9 +507,20 @@ function App() {
   );
 }
 
-function SideMenu({ open, close, categories, setActiveCategory }) {
+function SideMenu({
+  open,
+  close,
+  categories,
+  activeCategory,
+  setActiveCategory,
+  favoritesOnly,
+  toggleFavoritesOnly,
+  favoriteCount,
+  openTracking,
+}) {
   return (
     <div className={`overlay ${open ? 'open' : ''}`} aria-hidden={!open}>
+      <button className="scrim" onClick={close} aria-label="Menüyü kapat" />
       <aside className="side-panel left">
         <div className="panel-header">
           <strong>Menü</strong>
@@ -475,26 +528,53 @@ function SideMenu({ open, close, categories, setActiveCategory }) {
             <X size={21} />
           </button>
         </div>
-        <button className="menu-row">
-          <User size={18} /> Üyelik
-        </button>
-        <button className="menu-row">
-          <Heart size={18} /> Favorilerim
-        </button>
-        <a
-          className="menu-row"
-          href={waLink(TRACKING_TEXT)}
-          target="_blank"
-          rel="noreferrer"
-          onClick={close}
-        >
-          <Truck size={18} /> Sipariş Takibi
-        </a>
+
+        <div className="menu-brand">
+          <span className="brand-mark">C</span>
+          <div>
+            <strong>ChocoSite</strong>
+            <span>Denizli içi aynı gün teslimat</span>
+          </div>
+        </div>
+
+        <div className="menu-actions">
+          <button
+            className={`menu-row ${favoritesOnly ? 'active' : ''}`}
+            aria-pressed={favoritesOnly}
+            onClick={() => {
+              toggleFavoritesOnly();
+              close();
+            }}
+          >
+            <Heart size={18} /> Favorilerim
+            <span className="menu-count">{favoriteCount}</span>
+          </button>
+          <button
+            className="menu-row"
+            onClick={() => {
+              close();
+              openTracking();
+            }}
+          >
+            <Truck size={18} /> Sipariş Takibi
+          </button>
+          <a className="menu-row" href={waLink(ACCOUNT_TEXT)} target="_blank" rel="noreferrer" onClick={close}>
+            <User size={18} /> Üyelik &amp; Hesap
+          </a>
+          <a className="menu-row" href="#about" onClick={close}>
+            <Gift size={18} /> Hakkımızda
+          </a>
+          <a className="menu-row" href="#contact" onClick={close}>
+            <MessageCircle size={18} /> İletişim
+          </a>
+        </div>
+
         <div className="menu-categories">
           <span>Kategoriler</span>
           {categories.map((category) => (
             <button
               key={category}
+              className={activeCategory === category ? 'current' : ''}
               onClick={() => {
                 setActiveCategory(category);
                 close();
@@ -504,8 +584,66 @@ function SideMenu({ open, close, categories, setActiveCategory }) {
             </button>
           ))}
         </div>
+
+        <div className="menu-foot">
+          <a className="menu-whatsapp" href={waLink(ORDER_TEXT)} target="_blank" rel="noreferrer">
+            <WhatsAppIcon /> WhatsApp&apos;tan sipariş ver
+          </a>
+          <span>0541 401 52 62 · Merkezefendi &amp; Pamukkale</span>
+        </div>
       </aside>
+    </div>
+  );
+}
+
+function TrackingPanel({ open, close }) {
+  const [orderNo, setOrderNo] = useState('');
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (open && inputRef.current) inputRef.current.focus();
+  }, [open]);
+
+  const submit = (event) => {
+    event.preventDefault();
+    const value = orderNo.trim();
+    if (!value) return;
+    window.open(waLink(trackingText(value)), '_blank', 'noopener,noreferrer');
+    setOrderNo('');
+    close();
+  };
+
+  return (
+    <div className={`overlay ${open ? 'open' : ''}`} aria-hidden={!open}>
       <button className="scrim" onClick={close} aria-label="Kapat" />
+      <aside className="side-panel right" role="dialog" aria-modal="true" aria-labelledby="tracking-title">
+        <div className="panel-header">
+          <strong id="tracking-title">Siparişim Nerede?</strong>
+          <button className="icon-button" onClick={close} aria-label="Kapat">
+            <X size={21} />
+          </button>
+        </div>
+        <p className="track-hint">
+          Durumu öğrenmek için sipariş numaranızı girin. Mesajınız WhatsApp&apos;ta hazır şekilde açılacak.
+        </p>
+        <form className="track-form" onSubmit={submit}>
+          <label htmlFor="order-no">Sipariş numaranız</label>
+          <input
+            id="order-no"
+            ref={inputRef}
+            value={orderNo}
+            onChange={(event) => setOrderNo(event.target.value)}
+            placeholder="Örn. CS-1024"
+            autoComplete="off"
+          />
+          <button type="submit" disabled={!orderNo.trim()}>
+            WhatsApp&apos;tan sorgula
+          </button>
+        </form>
+        <div className="track-meta">
+          <MapPin size={16} /> Denizli içi aynı gün teslimat
+        </div>
+      </aside>
     </div>
   );
 }
