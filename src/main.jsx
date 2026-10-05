@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   Heart,
@@ -140,6 +140,21 @@ const products = [
   },
 ];
 
+const PALETTES = [
+  { id: 'cocoa-butter', label: 'Cocoa Butter', swatch: ['#7a4632', '#e0465c', '#ffc24a'] },
+  { id: 'marigold-picnic', label: 'Marigold Picnic', swatch: ['#b8451f', '#ffbe3d', '#c02e5c'] },
+  { id: 'jam-jar', label: 'Jam Jar', swatch: ['#a8324f', '#ffd166', '#ffb3c1'] },
+  { id: 'caramel-crunch', label: 'Caramel Crunch', swatch: ['#3f2a1e', '#d98324', '#ffd66b'] },
+];
+
+const readPalette = () => {
+  try {
+    return localStorage.getItem('chocosite-palette') || 'cocoa-butter';
+  } catch {
+    return 'cocoa-butter';
+  }
+};
+
 const formatPrice = (value) =>
   new Intl.NumberFormat('tr-TR', {
     style: 'currency',
@@ -156,6 +171,17 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [trackingOpen, setTrackingOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(true);
+  const [palette, setPalette] = useState(readPalette);
+
+  useEffect(() => {
+    document.documentElement.dataset.palette = palette;
+    try {
+      localStorage.setItem('chocosite-palette', palette);
+    } catch {
+      /* storage unavailable */
+    }
+  }, [palette]);
 
   const productCategories = ['Tüm Ürünler', ...new Set(products.map((product) => product.category))];
 
@@ -411,6 +437,33 @@ function App() {
         products={filteredProducts}
         addToCart={addToCart}
       />
+
+      <div className="palette-dock">
+        <button className="palette-toggle" onClick={() => setPaletteOpen((open) => !open)}>
+          <Sparkles size={15} />
+          {paletteOpen ? 'Palet' : 'Renk paleti'}
+        </button>
+        {paletteOpen && (
+          <div className="palette-menu" role="radiogroup" aria-label="Renk paleti">
+            {PALETTES.map((option) => (
+              <button
+                key={option.id}
+                role="radio"
+                aria-checked={palette === option.id}
+                className={palette === option.id ? 'active' : ''}
+                onClick={() => setPalette(option.id)}
+              >
+                <span className="palette-swatches">
+                  {option.swatch.map((color) => (
+                    <i key={color} style={{ background: color }} />
+                  ))}
+                </span>
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </>
   );
 }
