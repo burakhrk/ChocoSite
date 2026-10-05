@@ -5,7 +5,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 
-  /* ---- Palette: Bittersweet (default) — espresso, tangerine, cherry ---- */
+  /* ---- ChocoSite palette: Bittersweet — espresso, tangerine, cherry ---- */
   --pv-field: #35201a;
   --pv-header: #e4572e;
   --pv-band: #ffc53d;
@@ -37,60 +37,6 @@
   --mint: var(--pv-accent);
   --gold: var(--pv-band);
   --cocoa: var(--pv-ink);
-}
-
-[data-palette="pistachio-pop"] {
-  --pv-field: #1c3a26;
-  --pv-header: #127a4b;
-  --pv-band: #c7f04a;
-  --pv-hero: #0e1f16;
-  --pv-tile: #6fbf4a;
-  --pv-hot: #c4183c;
-  --pv-hot-ink: #a61233;
-  --pv-accent: #9c3d0b;
-  --pv-cream: #f7fbef;
-  --pv-cream-2: #fcfef8;
-  --pv-on-dark: #f8fdf3;
-  --pv-ink: #0f160f;
-  --pv-muted: #4e5f4d;
-  --pv-line: #b9d3ae;
-  --pv-panel: #f7fbef;
-}
-
-[data-palette="blueberry-truffle"] {
-  --pv-field: #221c4e;
-  --pv-header: #ff5c35;
-  --pv-band: #ffd166;
-  --pv-hero: #14112e;
-  --pv-tile: #ff7a45;
-  --pv-hot: #d52840;
-  --pv-hot-ink: #b3152f;
-  --pv-accent: #c2410c;
-  --pv-cream: #fff6ee;
-  --pv-cream-2: #fffcf7;
-  --pv-on-dark: #fffaf4;
-  --pv-ink: #131029;
-  --pv-muted: #5a5678;
-  --pv-line: #b0a8d8;
-  --pv-panel: #fff6ee;
-}
-
-[data-palette="turmeric-sky"] {
-  --pv-field: #17347f;
-  --pv-header: #e8a100;
-  --pv-band: #ffe066;
-  --pv-hero: #0e1f52;
-  --pv-tile: #f6c445;
-  --pv-hot: #d81e34;
-  --pv-hot-ink: #b01430;
-  --pv-accent: #a34e00;
-  --pv-cream: #fff8ea;
-  --pv-cream-2: #fffcf6;
-  --pv-on-dark: #fff9f0;
-  --pv-ink: #0e1330;
-  --pv-muted: #545778;
-  --pv-line: #9fadde;
-  --pv-panel: #fff8ea;
 }
 
 * {
@@ -1702,83 +1648,6 @@ footer strong {
   }
 }
 
-/* Palette switcher */
-.palette-dock {
-  position: fixed;
-  left: 14px;
-  bottom: 14px;
-  z-index: 60;
-  display: grid;
-  gap: 8px;
-  justify-items: start;
-}
-
-.palette-toggle,
-.palette-menu button {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 38px;
-  padding: 0 14px;
-  color: var(--pv-ink);
-  background: var(--pv-cream);
-  border: 2px solid var(--pv-ink);
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.palette-toggle {
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
-}
-
-.palette-toggle:hover,
-.palette-menu button:hover {
-  background: var(--pv-band);
-}
-
-.palette-menu {
-  display: grid;
-  gap: 7px;
-  padding: 10px;
-  background: var(--pv-cream);
-  border: 2px solid var(--pv-ink);
-  border-radius: 10px;
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.2);
-}
-
-.palette-menu button {
-  justify-content: flex-start;
-  min-height: 36px;
-  font-weight: 700;
-}
-
-.palette-menu button.active {
-  background: var(--pv-band);
-}
-
-.palette-menu button:focus-visible,
-.palette-toggle:focus-visible {
-  outline: 3px solid var(--pv-hot);
-  outline-offset: 2px;
-}
-
-.palette-swatches {
-  display: inline-flex;
-}
-
-.palette-swatches i {
-  width: 14px;
-  height: 14px;
-  margin-right: -6px;
-  border: 1.5px solid var(--pv-ink);
-  border-radius: 50%;
-}
-
-.palette-swatches i:last-child {
-  margin-right: 0;
-}
-
 /* Floating WhatsApp contact */
 .whatsapp-fab {
   position: fixed;
@@ -1812,15 +1681,6 @@ footer strong {
 }
 
 @media (max-width: 540px) {
-  .palette-dock {
-    left: 10px;
-    bottom: 10px;
-  }
-
-  .palette-menu button {
-    font-size: 12px;
-  }
-
   .whatsapp-fab {
     right: 10px;
     bottom: 10px;

@@ -8,14 +8,7 @@
       content="Denizli içi aynı gün teslimatlı çikolata, pasta, çiçek ve kutlama hediyeleri."
     />
     <title>ChocoSite | Denizli Çikolata ve Kutlama Hediyeleri</title>
-    <script>
-      try {
-        var known = ['bittersweet', 'pistachio-pop', 'blueberry-truffle', 'turmeric-sky'];
-        var fromUrl = new URLSearchParams(location.search).get('palette');
-        var palette = fromUrl || localStorage.getItem('chocosite-palette');
-        if (known.indexOf(palette) !== -1) document.documentElement.dataset.palette = palette;
-      } catch (error) {}
-    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
     <div id="root"></div>

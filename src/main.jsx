@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   Heart,
@@ -149,25 +149,6 @@ const products = [
   },
 ];
 
-const PALETTES = [
-  { id: 'bittersweet', label: 'Bittersweet', swatch: ['#17100c', '#e4572e', '#ffc53d'] },
-  { id: 'pistachio-pop', label: 'Pistachio Pop', swatch: ['#0e1f16', '#127a4b', '#c7f04a'] },
-  { id: 'blueberry-truffle', label: 'Blueberry Truffle', swatch: ['#14112e', '#ff5c35', '#ffd166'] },
-  { id: 'turmeric-sky', label: 'Turmeric Sky', swatch: ['#0e1f52', '#e8a100', '#ffe066'] },
-];
-
-const readPalette = () => {
-  try {
-    const fromUrl = new URLSearchParams(window.location.search).get('palette');
-    const stored = localStorage.getItem('chocosite-palette');
-    const candidate = fromUrl || stored;
-    if (candidate && PALETTES.some((palette) => palette.id === candidate)) return candidate;
-  } catch {
-    /* ignore */
-  }
-  return 'bittersweet';
-};
-
 const formatPrice = (value) =>
   new Intl.NumberFormat('tr-TR', {
     style: 'currency',
@@ -192,17 +173,6 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [trackingOpen, setTrackingOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const [palette, setPalette] = useState(readPalette);
-
-  useEffect(() => {
-    document.documentElement.dataset.palette = palette;
-    try {
-      localStorage.setItem('chocosite-palette', palette);
-    } catch {
-      /* storage unavailable */
-    }
-  }, [palette]);
 
   const productCategories = ['Tüm Ürünler', ...new Set(products.map((product) => product.category))];
 
@@ -460,33 +430,6 @@ function App() {
         products={filteredProducts}
         addToCart={addToCart}
       />
-
-      <div className="palette-dock">
-        <button className="palette-toggle" onClick={() => setPaletteOpen((open) => !open)}>
-          <Sparkles size={15} />
-          {paletteOpen ? 'Palet' : 'Renk paleti'}
-        </button>
-        {paletteOpen && (
-          <div className="palette-menu" role="radiogroup" aria-label="Renk paleti">
-            {PALETTES.map((option) => (
-              <button
-                key={option.id}
-                role="radio"
-                aria-checked={palette === option.id}
-                className={palette === option.id ? 'active' : ''}
-                onClick={() => setPalette(option.id)}
-              >
-                <span className="palette-swatches">
-                  {option.swatch.map((color) => (
-                    <i key={color} style={{ background: color }} />
-                  ))}
-                </span>
-                {option.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
 
       <a
         className="whatsapp-fab"
