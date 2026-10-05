@@ -810,6 +810,228 @@ function CartDrawer({ open, close, cart, total, updateQuantity, delivery, setDel
   );
 }
 
+function CheckoutPanel({ open, close, cart, total, delivery, setDeliveryField }) {
+  const [step, setStep] = useState(1);
+  const [payment, setPayment] = useState('card');
+
+  useEffect(() => {
+    if (open) setStep(1);
+  }, [open]);
+
+  const method = PAYMENT_METHODS.find((item) => item.id === payment) || PAYMENT_METHODS[0];
+  const entries = deliveryEntries(delivery);
+
+  return (
+    <div className={`overlay ${open ? 'open' : ''}`} aria-hidden={!open}>
+      <button className="scrim" onClick={close} aria-label="Ödemeyi kapat" />
+      <aside className="side-panel right checkout-panel" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+        <div className="panel-header">
+          <strong id="checkout-title">Ödeme</strong>
+          <button className="icon-button" onClick={close} aria-label="Ödemeyi kapat">
+            <X size={21} />
+          </button>
+        </div>
+
+        <ol className="checkout-steps">
+          {['Teslimat', 'Ödeme', 'Onay'].map((label, index) => (
+            <li
+              key={label}
+              className={step === index + 1 ? 'current' : step > index + 1 ? 'done' : ''}
+            >
+              <span>{index + 1}</span>
+              {label}
+            </li>
+          ))}
+        </ol>
+
+        {step === 1 && (
+          <form
+            className="checkout-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setStep(2);
+            }}
+          >
+            <label className="field">
+              <span>Ad Soyad</span>
+              <input
+                required
+                value={delivery.name}
+                onChange={(event) => setDeliveryField('name', event.target.value)}
+                placeholder="Adınız Soyadınız"
+                autoComplete="name"
+              />
+            </label>
+            <label className="field">
+              <span>Telefon</span>
+              <input
+                required
+                type="tel"
+                value={delivery.phone}
+                onChange={(event) => setDeliveryField('phone', event.target.value)}
+                placeholder="05xx xxx xx xx"
+                autoComplete="tel"
+              />
+            </label>
+            <label className="field">
+              <span>Adres</span>
+              <textarea
+                rows={3}
+                value={delivery.address}
+                onChange={(event) => setDeliveryField('address', event.target.value)}
+                placeholder="Açık adres veya tarif"
+              />
+            </label>
+            <div className="checkout-row">
+              <label className="field">
+                <span>Yer</span>
+                <input
+                  value={delivery.place}
+                  onChange={(event) => setDeliveryField('place', event.target.value)}
+                  placeholder="İlçe / mahalle"
+                  autoComplete="off"
+                />
+              </label>
+              <label className="field">
+                <span>Saat</span>
+                <input
+                  type="time"
+                  value={delivery.time}
+                  onChange={(event) => setDeliveryField('time', event.target.value)}
+                />
+              </label>
+            </div>
+            <label className="field">
+              <span>Not</span>
+              <input
+                value={delivery.note}
+                onChange={(event) => setDeliveryField('note', event.target.value)}
+                placeholder="Hediye kartı notu (opsiyonel)"
+                autoComplete="off"
+              />
+            </label>
+            <p className="field-hint">Yer ve saat opsiyoneldir; boş bırakılırsa mesaja eklenmez.</p>
+            <button type="submit" className="checkout-next">
+              Ödeme bilgilerine geç
+            </button>
+          </form>
+        )}
+
+        {step === 2 && (
+          <div className="checkout-step">
+            <div className="pay-options">
+              {PAYMENT_METHODS.map((item) => (
+                <label key={item.id} className={`pay-option ${payment === item.id ? 'active' : ''}`}>
+                  <input
+                    type="radio"
+                    name="payment"
+                    value={item.id}
+                    checked={payment === item.id}
+                    onChange={() => setPayment(item.id)}
+                  />
+                  <span className="pay-label">{item.label}</span>
+                  {item.tag && <span className="pay-tag">{item.tag}</span>}
+                </label>
+              ))}
+            </div>
+
+            {payment === 'card' && (
+              <div className="card-form">
+                <label className="field">
+                  <span>Kart numarası</span>
+                  <input disabled placeholder="0000 0000 0000 0000" inputMode="numeric" />
+                </label>
+                <div className="checkout-row">
+                  <label className="field">
+                    <span>Son kullanma</span>
+                    <input disabled placeholder="AA/YY" />
+                  </label>
+                  <label className="field">
+                    <span>CVV</span>
+                    <input disabled placeholder="123" />
+                  </label>
+                </div>
+                <label className="field">
+                  <span>Kart üzerindeki isim</span>
+                  <input disabled placeholder="Ad Soyad" />
+                </label>
+              </div>
+            )}
+
+            <p className="pay-notice">{method.note}</p>
+
+            <div className="checkout-nav">
+              <button type="button" className="ghost" onClick={() => setStep(1)}>
+                Geri
+              </button>
+              <button type="button" className="checkout-next" onClick={() => setStep(3)}>
+                Siparişi gözden geçir
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="checkout-step">
+            <div className="checkout-review">
+              <div className="review-rows">
+                {cart.map((item) => (
+                  <div key={item.id}>
+                    <span>
+                      {item.name} x{item.quantity}
+                    </span>
+                    <strong>{formatPrice(item.price * item.quantity)}</strong>
+                  </div>
+                ))}
+                <div className="review-total">
+                  <span>Ara toplam</span>
+                  <strong>{formatPrice(total)}</strong>
+                </div>
+              </div>
+              <dl className="review-details">
+                {entries.length === 0 ? (
+                  <div>
+                    <dt>Teslimat</dt>
+                    <dd>Belirtilmedi</dd>
+                  </div>
+                ) : (
+                  entries.map(([key, value]) => (
+                    <div key={key}>
+                      <dt>{key}</dt>
+                      <dd>{value.trim()}</dd>
+                    </div>
+                  ))
+                )}
+                <div>
+                  <dt>Ödeme</dt>
+                  <dd>{method.label}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <p className="pay-notice">{method.note}</p>
+
+            <a
+              className="checkout-submit"
+              href={waLink(checkoutOrderText(cart, total, delivery, method.label))}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <WhatsAppIcon /> Siparişi WhatsApp ile tamamla
+            </a>
+
+            <div className="checkout-nav">
+              <button type="button" className="ghost" onClick={() => setStep(2)}>
+                Geri
+              </button>
+            </div>
+          </div>
+        )}
+      </aside>
+    </div>
+  );
+}
+
 function SearchOverlay({ open, close, query, setQuery, products, addToCart }) {
   return (
     <div className={`search-overlay ${open ? 'open' : ''}`} aria-hidden={!open}>
