@@ -141,20 +141,22 @@ const products = [
 ];
 
 const PALETTES = [
-  { id: 'cocoa-butter', label: 'Cocoa Butter', swatch: ['#7a4632', '#e0465c', '#ffc24a'] },
-  { id: 'marigold-picnic', label: 'Marigold Picnic', swatch: ['#b8451f', '#ffbe3d', '#c02e5c'] },
-  { id: 'jam-jar', label: 'Jam Jar', swatch: ['#a8324f', '#ffd166', '#ffb3c1'] },
-  { id: 'caramel-crunch', label: 'Caramel Crunch', swatch: ['#3f2a1e', '#d98324', '#ffd66b'] },
+  { id: 'bittersweet', label: 'Bittersweet', swatch: ['#17100c', '#e4572e', '#ffc53d'] },
+  { id: 'pistachio-pop', label: 'Pistachio Pop', swatch: ['#0e1f16', '#127a4b', '#c7f04a'] },
+  { id: 'blueberry-truffle', label: 'Blueberry Truffle', swatch: ['#14112e', '#ff5c35', '#ffd166'] },
+  { id: 'turmeric-sky', label: 'Turmeric Sky', swatch: ['#0e1f52', '#e8a100', '#ffe066'] },
 ];
 
 const readPalette = () => {
   try {
     const fromUrl = new URLSearchParams(window.location.search).get('palette');
-    if (fromUrl) return fromUrl;
-    return localStorage.getItem('chocosite-palette') || 'cocoa-butter';
+    const stored = localStorage.getItem('chocosite-palette');
+    const candidate = fromUrl || stored;
+    if (candidate && PALETTES.some((palette) => palette.id === candidate)) return candidate;
   } catch {
-    return 'cocoa-butter';
+    /* ignore */
   }
+  return 'bittersweet';
 };
 
 const formatPrice = (value) =>

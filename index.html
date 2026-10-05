@@ -10,9 +10,10 @@
     <title>ChocoSite | Çikolata ve Kutlama Hediyeleri</title>
     <script>
       try {
+        var known = ['bittersweet', 'pistachio-pop', 'blueberry-truffle', 'turmeric-sky'];
         var fromUrl = new URLSearchParams(location.search).get('palette');
         var palette = fromUrl || localStorage.getItem('chocosite-palette');
-        if (palette) document.documentElement.dataset.palette = palette;
+        if (known.indexOf(palette) !== -1) document.documentElement.dataset.palette = palette;
       } catch (error) {}
     </script>
   </head>
