@@ -1,8 +1,8 @@
 import { useMemo, useRef, useState } from 'react';
-import { Home as HomeIcon, LayoutGrid, MapPin, Menu, MessageCircle, Plus, Search, ShoppingBag, Truck } from 'lucide-react';
+import { Home as HomeIcon, LayoutGrid, MapPin, Menu, MessageCircle, Plus, Search, ShoppingBag } from 'lucide-react';
 import { formatPrice, primaryImage, useStore } from '../store.jsx';
 import heroPhoto from '../assets/Images/chocopack.png';
-import { CART_HREF, CartBadge, Drip, NOTE_MAX, NOTE_PRESETS, ZonePicker, checker, isIllustration, productHref, useScrollMotion, waLink } from './shared.jsx';
+import { CART_HREF, CartBadge, Drip, NOTE_MAX, NOTE_PRESETS, checker, isIllustration, productHref, useScrollMotion, waLink } from './shared.jsx';
 
 const ALL = 'Tümü';
 const TILE_LIMIT = 6;
@@ -34,8 +34,7 @@ export default function RedesignHome({ shop }) {
   const footerRef = useRef(null);
 
   const { products, count, total, bumpKey } = shop;
-  const zones = site.branches.map((branch) => branch.name);
-  const { zone, note } = shop.delivery;
+  const { note } = shop.delivery;
   const setNote = (value) => shop.setDelivery({ note: value });
   const [category, setCategory] = useState(ALL);
   const [orderNo, setOrderNo] = useState('');
@@ -79,7 +78,7 @@ export default function RedesignHome({ shop }) {
     window.open(waLink(whatsapp.tracking.replace('{SIPARIS_NO}', value)), '_blank', 'noopener,noreferrer');
   };
 
-  const tickerItems = [site.heroSubtitle, site.menuBranchLine, 'Kişiye özel not kartı'];
+  const tickerItems = [site.heroSubtitle, 'Kişiye özel not kartı', 'WhatsApp ile kolay sipariş'];
   const band = `${site.marquee} ✦ `.repeat(6);
 
   return (
@@ -176,18 +175,8 @@ export default function RedesignHome({ shop }) {
           </div>
         </section>
 
-        <section style={{ position: 'relative', padding: '0 var(--gutter) 34px' }}>
+        <section style={{ padding: '0 var(--gutter) 22px' }}>
           <Drip color="#FFD45C" />
-          <div className="cs-rv cs-delivery-card" style={{ '--r': '3deg', marginTop: -44, position: 'relative', zIndex: 2, padding: 16, borderRadius: 26, background: '#FFFDF8', border: '2px solid #3B1A12', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-              <span style={{ fontWeight: 700 }}>Nereye gönderelim?</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#2F6B2A' }}>
-                <Truck size={18} aria-hidden="true" />
-                Bugün teslim
-              </span>
-            </div>
-            <ZonePicker zones={zones} zone={zone} onChange={(name) => shop.setDelivery({ zone: name })} />
-          </div>
         </section>
 
         <section ref={catsRef} style={{ padding: '6px 0 40px', scrollMarginTop: 60 }}>
@@ -369,13 +358,10 @@ export default function RedesignHome({ shop }) {
             Choco<br />Site
           </div>
           <p style={{ marginTop: 18, color: '#EBD9C6', maxWidth: 300 }}>{site.footerTagline}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20 }}>
-            {site.branches.map((branch) => (
-              <a key={branch.name} href={waLink(branch.text)} target="_blank" rel="noreferrer" style={{ minHeight: 44, padding: '0 16px', display: 'inline-flex', alignItems: 'center', borderRadius: 999, border: '2px solid #FF9EC0', color: '#FF9EC0', fontWeight: 600 }}>
-                {branch.name}
-              </a>
-            ))}
-          </div>
+          <a href={waLink(whatsapp.order)} target="_blank" rel="noreferrer" className="cs-footer-whatsapp">
+            <MessageCircle size={22} aria-hidden="true" />
+            {site.menuWhatsappLabel}
+          </a>
           <a className="cs-display" href={`tel:+9${site.phone.replace(/\D/g, '')}`} style={{ display: 'block', marginTop: 22, fontSize: 30, color: '#FFF6E0' }}>
             {site.phone}
           </a>

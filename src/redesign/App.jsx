@@ -30,7 +30,6 @@ export default function RedesignApp() {
   const [cart, setCart] = useState(readCart);
   const [bumpKey, setBumpKey] = useState(0);
   const [delivery, setDeliveryState] = useState(() => ({
-    zone: (state.site.branches[0] && state.site.branches[0].name) || '',
     day: 0,
     time: '',
     note: '',

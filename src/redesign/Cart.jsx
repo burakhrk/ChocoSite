@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { MessageCircle, Minus, Plus } from 'lucide-react';
 import { formatPrice, primaryImage, useStore } from '../store.jsx';
-import { DeliveryPicker, Drip, HOME_HREF, NoteCard, SubHeader, ZonePicker, isIllustration, orderText, productHref, useScrollMotion, waLink } from './shared.jsx';
+import { DeliveryPicker, Drip, HOME_HREF, NoteCard, SubHeader, isIllustration, orderText, productHref, useScrollMotion, waLink } from './shared.jsx';
 
 const LINE_TONES = ['#FFF3C9', '#EDF7FC', '#F1FAE8', '#F6ECFD'];
 const STEPS = ['Sepet', 'Teslimat', 'Onay'];
@@ -14,7 +14,7 @@ const FIELDS = [
 
 export default function CartPage({ shop }) {
   const { state } = useStore();
-  const { site, whatsapp, payments } = state;
+  const { whatsapp, payments } = state;
   const rootRef = useRef(null);
   const [form, setForm] = useState({ name: '', recipient: '', phone: '', address: '' });
   const [paymentId, setPaymentId] = useState(payments[0] ? payments[0].id : '');
@@ -94,9 +94,6 @@ export default function CartPage({ shop }) {
           <section style={{ background: '#FFE1EC', padding: '0 var(--gutter) 34px' }}>
             <Drip color="#FFFDF8" />
             <h2 className="cs-rv cs-display cs-h2" style={{ marginTop: 26, }}>Kime gidiyor?</h2>
-            <div className="cs-rv" style={{ marginTop: 16 }}>
-              <ZonePicker zones={site.branches.map((branch) => branch.name)} zone={delivery.zone} onChange={(name) => shop.setDelivery({ zone: name })} ground="#FFFDF8" />
-            </div>
             <div className="cs-rv" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 18 }}>
               {FIELDS.map((field) => (
                 <label key={field.key} className="cs-label" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>

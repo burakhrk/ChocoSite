@@ -46,7 +46,6 @@ export const orderText = ({ lines, total, delivery, form, paymentLabel, whatsapp
   );
   const day = deliveryDays()[delivery.day] || deliveryDays()[0];
   const details = [
-    ['Teslimat yeri', delivery.zone],
     ['Teslimat günü', day.label],
     ['Teslimat saati', delivery.time],
     ['Ad Soyad', form.name],
@@ -141,18 +140,6 @@ export function SubHeader({ title, color, backHref = HOME_HREF, backLabel = 'Ger
       <span className="cs-display" style={{ flex: 1, textAlign: 'center', fontSize: 22 }}>{title}</span>
       {children || <span style={{ width: 44 }} />}
     </header>
-  );
-}
-
-export function ZonePicker({ zones, zone, onChange, ground = '#FFE1EC' }) {
-  return (
-    <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: ground }}>
-      {zones.map((name) => (
-        <button key={name} type="button" className={`cs-seg${zone === name ? ' cs-active' : ''}`} aria-pressed={zone === name} onClick={() => onChange(name)}>
-          {name}
-        </button>
-      ))}
-    </div>
   );
 }
 
