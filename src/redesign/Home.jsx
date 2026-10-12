@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { Home as HomeIcon, LayoutGrid, MapPin, Menu, MessageCircle, Plus, Search, ShoppingBag } from 'lucide-react';
-import { formatPrice, primaryImage, useStore } from '../store.jsx';
+import { formatPrice, primaryImage, trackingMessage, useStore } from '../store.jsx';
 import heroPhoto from '../assets/Images/chocopack.png';
 import { CART_HREF, CartBadge, Drip, NOTE_MAX, NOTE_PRESETS, checker, isIllustration, productHref, useScrollMotion, waLink } from './shared.jsx';
 
@@ -37,7 +37,7 @@ export default function RedesignHome({ shop }) {
   const { note } = shop.delivery;
   const setNote = (value) => shop.setDelivery({ note: value });
   const [category, setCategory] = useState(ALL);
-  const [orderNo, setOrderNo] = useState('');
+  const [trackName, setTrackName] = useState('');
 
   const chips = useMemo(() => {
     const used = state.categories.filter((name) => products.some((product) => product.categories.includes(name)));
@@ -73,9 +73,9 @@ export default function RedesignHome({ shop }) {
 
   const trackOrder = (event) => {
     event.preventDefault();
-    const value = orderNo.trim();
+    const value = trackName.trim();
     if (!value) return;
-    window.open(waLink(whatsapp.tracking.replace('{SIPARIS_NO}', value)), '_blank', 'noopener,noreferrer');
+    window.open(waLink(trackingMessage(whatsapp.tracking, value)), '_blank', 'noopener,noreferrer');
   };
 
   const tickerItems = [site.heroSubtitle, 'Kişiye özel not kartı', 'WhatsApp ile kolay sipariş'];
@@ -342,8 +342,8 @@ export default function RedesignHome({ shop }) {
             <form onSubmit={trackOrder} style={{ background: '#FFFDF8', borderRadius: 22, padding: '22px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <h2 className="cs-display cs-h2" style={{ lineHeight: 1.05 }}>Siparişim nerede?</h2>
               <p style={{ fontSize: 15, color: '#6B4A40' }}>{site.trackHint}</p>
-              <label htmlFor="cs-track" style={{ fontWeight: 700, fontSize: 14 }}>Sipariş numarası</label>
-              <input id="cs-track" type="text" value={orderNo} onChange={(event) => setOrderNo(event.target.value)} placeholder={site.trackPlaceholder} style={{ width: '100%', height: 52, padding: '0 16px', borderRadius: 16, border: '2px solid #3B1A12', background: '#fff', color: '#3B1A12', font: '600 16px Outfit, sans-serif' }} />
+              <label htmlFor="cs-track" style={{ fontWeight: 700, fontSize: 14 }}>Adınız soyadınız</label>
+              <input id="cs-track" type="text" autoComplete="name" value={trackName} onChange={(event) => setTrackName(event.target.value)} placeholder={site.trackPlaceholder} style={{ width: '100%', height: 52, padding: '0 16px', borderRadius: 16, border: '2px solid #3B1A12', background: '#fff', color: '#3B1A12', font: '600 16px Outfit, sans-serif' }} />
               <button type="submit" style={{ minHeight: 52, border: 0, borderRadius: 999, background: '#3B1A12', color: '#FFD45C', fontWeight: 700, fontSize: 16 }}>
                 {site.trackButton}
               </button>

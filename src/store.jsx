@@ -252,16 +252,16 @@ const DEFAULT_SITE = {
   menuWhatsappLabel: "WhatsApp'tan sipariş ver",
   menuBranchLine: 'Merkezefendi & Pamukkale',
   trackHint:
-    "Durumu öğrenmek için sipariş numaranızı girin. Mesajınız WhatsApp'ta hazır şekilde açılacak.",
+    "Durumu öğrenmek için adınızı ve soyadınızı yazın. Mesajınız WhatsApp'ta hazır şekilde açılacak.",
   trackMeta: "Denizli içi aynı gün teslimat",
-  trackPlaceholder: 'Örn. CS-1024',
+  trackPlaceholder: 'Örn. Ayşe Yılmaz',
   trackButton: "WhatsApp'tan sorgula",
 };
 
 const DEFAULT_WHATSAPP = {
   order: "Merhaba, ChocoSite'den sipariş vermek istiyorum.",
   account: 'Merhaba, üyelik ve hesap işlemleri hakkında bilgi almak istiyorum.',
-  tracking: 'Merhaba, siparişim nerede? Sipariş numaram: {SIPARIS_NO}',
+  tracking: 'Merhaba, siparişim nerede? Adım soyadım: {AD_SOYAD}',
   cartIntro: 'Merhaba, sipariş vermek istiyorum:',
   paymentPrefix: 'Ödeme şekli:',
   fabLabel: 'WhatsApp ile Denizli siparişi ver',
@@ -283,6 +283,24 @@ export const DEFAULT_STATE = {
   whatsapp: DEFAULT_WHATSAPP,
   payments: DEFAULT_PAYMENTS,
 };
+
+// Sipariş takibi artık isimle yapılıyor; kayıtlı içerikte eski varsayılan metinler kaldıysa yenisi kullanılır.
+const LEGACY_TRACK_TEXTS = {
+  trackHint: "Durumu öğrenmek için sipariş numaranızı girin. Mesajınız WhatsApp'ta hazır şekilde açılacak.",
+  trackPlaceholder: 'Örn. CS-1024',
+  tracking: 'Merhaba, siparişim nerede? Sipariş numaram: {SIPARIS_NO}',
+};
+
+const dropLegacyTrackTexts = (saved) => {
+  const next = { ...(saved || {}) };
+  Object.keys(LEGACY_TRACK_TEXTS).forEach((key) => {
+    if (next[key] === LEGACY_TRACK_TEXTS[key]) delete next[key];
+  });
+  return next;
+};
+
+export const trackingMessage = (template, name) =>
+  String(template || '{AD_SOYAD}').replace('{AD_SOYAD}', name).replace('{SIPARIS_NO}', name);
 
 const asArray = (value, fallback) =>
   Array.isArray(value) && value.length ? value : fallback;
@@ -322,8 +340,8 @@ export const normalize = (input) => {
   return {
     categories: asArray(raw.categories, DEFAULT_CATEGORIES).map(String),
     products: asArray(raw.products, DEFAULT_PRODUCTS).map(normalizeProduct),
-    site: { ...DEFAULT_SITE, ...(raw.site || {}) },
-    whatsapp: { ...DEFAULT_WHATSAPP, ...(raw.whatsapp || {}) },
+    site: { ...DEFAULT_SITE, ...dropLegacyTrackTexts(raw.site) },
+    whatsapp: { ...DEFAULT_WHATSAPP, ...dropLegacyTrackTexts(raw.whatsapp) },
     payments: normalizePayments(raw.payments),
   };
 };

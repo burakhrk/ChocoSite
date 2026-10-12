@@ -17,7 +17,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import './styles.css';
-import { ASSETS, StoreProvider, formatPrice, primaryImage, useStore } from './store.jsx';
+import { ASSETS, StoreProvider, formatPrice, primaryImage, trackingMessage, useStore } from './store.jsx';
 import AdminApp from './admin/AdminApp.jsx';
 import RedesignApp from './redesign/App.jsx';
 
@@ -26,7 +26,7 @@ const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 const waLink = (text) => `${WHATSAPP_LINK}?text=${encodeURIComponent(text)}`;
 
 const trackingText = (orderNo, template) =>
-  String(template || '{SIPARIS_NO}').replace('{SIPARIS_NO}', orderNo);
+  trackingMessage(template, orderNo);
 
 const CONFETTI_COLORS = ['var(--pv-band)', 'var(--pv-hot-ink)', 'var(--pv-hot)', 'var(--pv-muted)'];
 

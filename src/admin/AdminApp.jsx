@@ -31,6 +31,7 @@ import {
   ASSETS,
   ASSET_LABELS,
   fileToDataUrl,
+  trackingMessage,
   formatPrice,
   primaryImage,
   storageUsage,
@@ -1053,7 +1054,7 @@ function SiteTextsPage({ store, notify }) {
             onChange={(value) => set('trackMeta', value)}
           />
           <TextField
-            label="Örnek numara"
+            label="Örnek isim"
             value={site.trackPlaceholder}
             onChange={(value) => set('trackPlaceholder', value)}
           />
@@ -1106,7 +1107,7 @@ function WhatsAppPage({ store }) {
             label="Sipariş takibi mesajı"
             rows={3}
             value={wa.tracking}
-            hint="{SIPARIS_NO} yer tutucusu sipariş numarasıyla değiştirilir."
+            hint="{AD_SOYAD} yer tutucusu müşterinin yazdığı isimle değiştirilir."
             onChange={(value) => set('tracking', value)}
           />
           <TextField
@@ -1134,7 +1135,7 @@ function WhatsAppPage({ store }) {
       <Card title="Ön izleme" hint="Yüzen butonun açacağı mesaj.">
         <div className="adm-wa-preview">{wa.order}</div>
         <div className="adm-wa-preview">
-          {wa.tracking.replace('{SIPARIS_NO}', 'CS-1024')}
+          {trackingMessage(wa.tracking, 'Ayşe Yılmaz')}
         </div>
         <p className="adm-hint">
           İlçe mesajları “Ana Sayfa Metinleri → Alt bilgi” bölümünden düzenlenir.
