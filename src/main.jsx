@@ -19,6 +19,7 @@ import {
 import './styles.css';
 import { ASSETS, StoreProvider, formatPrice, primaryImage, useStore } from './store.jsx';
 import AdminApp from './admin/AdminApp.jsx';
+import RedesignHome from './redesign/Home.jsx';
 
 const WHATSAPP_NUMBER = '905414015262';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
@@ -1066,11 +1067,17 @@ const isAdminRoute = () => {
   return window.location.hash.startsWith('#/admin');
 };
 
+const isRedesignRoute = () => window.location.hash.startsWith('#/yeni');
+
 function Root() {
   const [admin, setAdmin] = useState(isAdminRoute);
+  const [redesign, setRedesign] = useState(isRedesignRoute);
 
   useEffect(() => {
-    const sync = () => setAdmin(isAdminRoute());
+    const sync = () => {
+      setAdmin(isAdminRoute());
+      setRedesign(isRedesignRoute());
+    };
     window.addEventListener('hashchange', sync);
     window.addEventListener('popstate', sync);
     return () => {
@@ -1083,6 +1090,14 @@ function Root() {
     document.title = admin ? 'ChocoSite Yönetim' : SHOP_TITLE;
     if (admin) window.scrollTo(0, 0);
   }, [admin]);
+
+  if (redesign && !admin) {
+    return (
+      <StoreProvider>
+        <RedesignHome />
+      </StoreProvider>
+    );
+  }
 
   return <StoreProvider>{admin ? <AdminApp /> : <App />}</StoreProvider>;
 }
