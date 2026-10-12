@@ -20,7 +20,7 @@ export const CART_HREF = '#/sepet';
 export const HOME_HREF = '#/';
 
 export const Drip = ({ color }) => (
-  <div className="cs-drip" aria-hidden="true" style={{ '--c': color, margin: '0 -24px' }} />
+  <div className="cs-drip" aria-hidden="true" style={{ '--c': color, margin: '0 calc(var(--gutter) * -1)' }} />
 );
 
 const DAY_NAMES = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
@@ -134,7 +134,7 @@ export function CartBadge({ count, bumpKey }) {
 
 export function SubHeader({ title, color, backHref = HOME_HREF, backLabel = 'Geri', children }) {
   return (
-    <header style={{ position: 'sticky', top: 0, zIndex: 30, display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', background: color }}>
+    <header style={{ position: 'sticky', top: 0, zIndex: 30, display: 'flex', alignItems: 'center', gap: 6, padding: '8px var(--gutter-tight)', background: color }}>
       <a href={backHref} aria-label={backLabel} style={{ width: 44, height: 44, display: 'grid', placeItems: 'center', borderRadius: '50%', background: '#FFFDF8' }}>
         <ChevronLeft size={24} strokeWidth={2.6} aria-hidden="true" />
       </a>
@@ -160,7 +160,7 @@ export function DeliveryPicker({ delivery, setDelivery }) {
   const days = deliveryDays();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div className="cs-hs" style={{ gap: 10, margin: '0 -20px', padding: '10px 20px 4px' }}>
+      <div className="cs-hs" style={{ gap: 10, margin: '0 calc(var(--gutter) * -1)', padding: '10px var(--gutter) 4px' }}>
         {days.map((day) => (
           <button key={day.offset} type="button" className={`cs-day${delivery.day === day.offset ? ' cs-active' : ''}`} aria-pressed={delivery.day === day.offset} aria-label={day.label} onClick={() => setDelivery({ day: day.offset })}>
             <span>{day.short}</span>
@@ -183,7 +183,7 @@ export function NoteCard({ note, setNote, id = 'cs-note' }) {
         <textarea id={id} rows={3} maxLength={NOTE_MAX} placeholder="İçinden geleni yaz…" value={note} onChange={(event) => setNote(event.target.value)} className="cs-hand" style={{ width: '100%', border: 0, outlineOffset: 6, background: 'transparent', color: '#3B1A12', fontSize: 28, lineHeight: 1.1, resize: 'none' }} />
         <div style={{ textAlign: 'right', fontSize: 13, color: '#6B4A40' }}>{NOTE_MAX - note.length} karakter kaldı</div>
       </div>
-      <div className="cs-hs" style={{ gap: 8, margin: '0 -20px', padding: '4px 20px' }}>
+      <div className="cs-hs" style={{ gap: 8, margin: '0 calc(var(--gutter) * -1)', padding: '4px var(--gutter)' }}>
         {NOTE_PRESETS.map((preset) => (
           <button key={preset} type="button" className="cs-chip" onClick={() => setNote(preset)}>
             {preset}

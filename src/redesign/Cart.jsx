@@ -30,10 +30,10 @@ export default function CartPage({ shop }) {
   );
 
   return (
-    <div className="cs-root" ref={rootRef} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="cs-root cs-cart" ref={rootRef} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <SubHeader title="Sepetim" color="#BFE3A2" backLabel="Alışverişe dön" />
 
-      <section style={{ background: '#BFE3A2', padding: '10px 20px 34px' }}>
+      <section style={{ background: '#BFE3A2', padding: '10px var(--gutter) 34px' }}>
         <h1 className="cs-rv cs-display" style={{ fontSize: 40, lineHeight: 1.02 }}>
           {empty ? 'Sepetin şimdilik boş' : 'Kutun neredeyse hazır'}
         </h1>
@@ -49,7 +49,7 @@ export default function CartPage({ shop }) {
         </ol>
       </section>
 
-      <section style={{ padding: '0 20px 30px' }}>
+      <section style={{ padding: '0 var(--gutter) 30px' }}>
         <Drip color="#BFE3A2" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 22 }}>
           {lines.map(({ product, qty }, index) => {
@@ -91,9 +91,9 @@ export default function CartPage({ shop }) {
 
       {!empty && (
         <>
-          <section style={{ background: '#FFE1EC', padding: '0 20px 34px' }}>
+          <section style={{ background: '#FFE1EC', padding: '0 var(--gutter) 34px' }}>
             <Drip color="#FFFDF8" />
-            <h2 className="cs-rv cs-display" style={{ marginTop: 26, fontSize: 28 }}>Kime gidiyor?</h2>
+            <h2 className="cs-rv cs-display cs-h2" style={{ marginTop: 26, }}>Kime gidiyor?</h2>
             <div className="cs-rv" style={{ marginTop: 16 }}>
               <ZonePicker zones={site.branches.map((branch) => branch.name)} zone={delivery.zone} onChange={(name) => shop.setDelivery({ zone: name })} ground="#FFFDF8" />
             </div>
@@ -109,20 +109,20 @@ export default function CartPage({ shop }) {
                 <textarea className="cs-field" rows={3} autoComplete="street-address" value={form.address} onChange={setField('address')} style={{ resize: 'none' }} />
               </label>
             </div>
-            <h2 className="cs-rv cs-display" style={{ marginTop: 28, fontSize: 28 }}>Ne zaman gelsin?</h2>
+            <h2 className="cs-rv cs-display cs-h2" style={{ marginTop: 28, }}>Ne zaman gelsin?</h2>
             <DeliveryPicker delivery={delivery} setDelivery={shop.setDelivery} />
           </section>
 
-          <section style={{ background: '#FFF3C9', padding: '0 20px 34px' }}>
+          <section style={{ background: '#FFF3C9', padding: '0 var(--gutter) 34px' }}>
             <Drip color="#FFE1EC" />
             <div className="cs-rv" style={{ '--r': '-5deg', marginTop: 24 }}>
               <NoteCard note={delivery.note} setNote={(value) => shop.setDelivery({ note: value })} id="cs-cart-note" />
             </div>
           </section>
 
-          <section style={{ padding: '0 20px 30px' }}>
+          <section style={{ padding: '0 var(--gutter) 30px' }}>
             <Drip color="#FFF3C9" />
-            <h2 className="cs-rv cs-display" style={{ marginTop: 26, fontSize: 28 }}>Ödeme</h2>
+            <h2 className="cs-rv cs-display cs-h2" style={{ marginTop: 26, }}>Ödeme</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
               {payments.map((method) => {
                 const active = payment && payment.id === method.id;

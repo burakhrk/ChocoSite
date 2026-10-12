@@ -13,8 +13,8 @@
   --berry: #d8323c;
   --paper: #fffdf8;
   --muted: #6b4a40;
-  max-width: 480px;
-  margin: 0 auto;
+  --gutter: 20px;
+  --gutter-tight: 12px;
   position: relative;
   overflow-x: clip;
   background: var(--paper);
@@ -402,5 +402,179 @@
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* ---- Yerleşim: mobil varsayılan, geniş ekranlarda aşağıdaki kurallar devreye girer ---- */
+.cs-h2 {
+  font-size: clamp(30px, 4vw, 52px);
+}
+.cs-hero-title {
+  font-size: clamp(46px, 6.4vw, 88px);
+}
+.cs-hero-lead {
+  max-width: 300px;
+  font-size: 17px;
+}
+.cs-cat-tile {
+  flex: none;
+  width: 184px;
+}
+.cs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.cs-desktop-nav {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .cs-root {
+    --gutter: 32px;
+    --gutter-tight: 24px;
+  }
+  .cs-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (min-width: 900px) {
+  .cs-root {
+    --gutter: max(48px, calc((100vw - 1160px) / 2));
+    --gutter-tight: var(--gutter);
+  }
+  .cs-root.cs-cart {
+    --gutter: max(48px, calc((100vw - 760px) / 2));
+  }
+  .cs-root .cs-mobile-only,
+  .cs-root .cs-tabbar {
+    display: none !important;
+  }
+  .cs-desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 10px;
+  }
+  .cs-desktop-nav button,
+  .cs-desktop-nav a {
+    min-height: 44px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--cocoa);
+    font-weight: 600;
+    font-size: 16px;
+    transition: background 0.2s;
+  }
+  .cs-desktop-nav button:hover,
+  .cs-desktop-nav a:hover {
+    background: var(--paper);
+  }
+
+  .cs-hero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    column-gap: 56px;
+    align-content: center;
+    min-height: 640px;
+  }
+  .cs-hero > * {
+    grid-column: 1;
+    justify-self: start;
+  }
+  .cs-hero-art {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    align-self: center;
+    justify-self: center;
+    width: 330px;
+    zoom: 1.45;
+  }
+  .cs-hero-lead {
+    max-width: 440px;
+    font-size: 21px;
+  }
+  .cs-hero-cta {
+    width: 380px;
+  }
+  .cs-delivery-card {
+    max-width: 460px;
+  }
+
+  .cs-cats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 20px;
+    overflow: visible;
+  }
+  .cs-cat-tile {
+    width: auto;
+  }
+  .cs-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 26px;
+  }
+  .cs-narrow {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .cs-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  .cs-split .cs-hs {
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+    flex-wrap: wrap;
+  }
+  .cs-about-pic {
+    max-width: 440px;
+    justify-self: center;
+    width: 100%;
+  }
+  .cs-minicart {
+    align-self: flex-end;
+    width: 420px;
+    margin-right: var(--gutter) !important;
+    margin-bottom: 20px !important;
+  }
+
+  .cs-product-layout {
+    --gutter: 56px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .cs-product-gallery {
+    position: sticky !important;
+    top: 60px;
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .cs-product-info {
+    padding-top: 40px;
+    min-width: 0;
+  }
+  .cs-product-info .cs-drip {
+    display: none;
+  }
+  .cs-bottombar {
+    justify-content: flex-end;
+    padding-inline: var(--gutter);
+  }
+  .cs-bottombar .cs-cta {
+    flex: none !important;
+    width: 420px;
   }
 }

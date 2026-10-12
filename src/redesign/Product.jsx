@@ -18,7 +18,7 @@ export default function ProductPage({ id, shop }) {
     return (
       <div className="cs-root" ref={rootRef} style={{ minHeight: '100vh' }}>
         <SubHeader title="ChocoSite" color="#FFD0E0" />
-        <div style={{ padding: '60px 20px', display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', textAlign: 'center' }}>
+        <div style={{ padding: '60px var(--gutter)', display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', textAlign: 'center' }}>
           <p className="cs-hand" style={{ fontSize: 30 }}>Bu ürünü bulamadık</p>
           <a className="cs-cta" href={HOME_HREF}>Hediyelere göz at</a>
         </div>
@@ -46,7 +46,8 @@ export default function ProductPage({ id, shop }) {
         <CartBadge count={shop.count} bumpKey={shop.bumpKey} />
       </SubHeader>
 
-      <section style={{ position: 'relative', background: '#FFD0E0', padding: '16px 20px 40px' }}>
+      <div className="cs-product-layout">
+      <section className="cs-product-gallery" style={{ position: 'relative', background: '#FFD0E0', padding: '16px var(--gutter) 40px' }}>
         <div style={{ position: 'relative', height: 372 }}>
           <div className="cs-hero-back cs-scallop" aria-hidden="true" style={{ position: 'absolute', left: '50%', top: 10, width: 308, height: 352, marginLeft: -154, background: '#FFD45C' }} />
           <div className="cs-product-pic" style={{ position: 'absolute', left: '50%', top: 6, width: 308, height: 352, marginLeft: -154 }}>
@@ -73,7 +74,8 @@ export default function ProductPage({ id, shop }) {
         )}
       </section>
 
-      <section style={{ padding: '0 20px 28px' }}>
+      <div className="cs-product-info">
+      <section style={{ padding: '0 var(--gutter) 28px' }}>
         <Drip color="#FFD0E0" />
         <p className="cs-rv cs-hand" style={{ marginTop: 22, fontSize: 22, color: '#D8323C' }}>{product.categories.join(' · ')}</p>
         <h1 className="cs-rv cs-display" style={{ fontSize: 42, lineHeight: 1.02 }}>{product.name}</h1>
@@ -84,12 +86,12 @@ export default function ProductPage({ id, shop }) {
         {product.description && <p className="cs-rv" style={{ marginTop: 12, color: '#6B4A40' }}>{product.description}</p>}
       </section>
 
-      <section style={{ padding: '0 20px 30px' }}>
+      <section style={{ padding: '0 var(--gutter) 30px' }}>
         <h2 className="cs-rv" style={{ fontSize: 18, fontWeight: 700 }}>Ne zaman gelsin?</h2>
         <DeliveryPicker delivery={shop.delivery} setDelivery={shop.setDelivery} />
       </section>
 
-      <section style={{ background: '#FFF3C9', padding: '0 20px 34px' }}>
+      <section style={{ background: '#FFF3C9', padding: '0 var(--gutter) 34px' }}>
         <Drip color="#FFFDF8" />
         <div className="cs-rv" style={{ '--r': '-5deg', marginTop: 24 }}>
           <NoteCard note={shop.delivery.note} setNote={(value) => shop.setDelivery({ note: value })} />
@@ -98,8 +100,8 @@ export default function ProductPage({ id, shop }) {
 
       {extraProducts.length > 0 && (
         <section style={{ padding: '30px 0 34px' }}>
-          <h2 className="cs-rv" style={{ padding: '0 20px', fontSize: 18, fontWeight: 700 }}>Yanına ekle</h2>
-          <div className="cs-hs" style={{ gap: 12, padding: '16px 20px 8px' }}>
+          <h2 className="cs-rv" style={{ padding: '0 var(--gutter)', fontSize: 18, fontWeight: 700 }}>Yanına ekle</h2>
+          <div className="cs-hs" style={{ gap: 12, padding: '16px var(--gutter) 8px' }}>
             {extraProducts.map((item) => {
               const image = primaryImage(item);
               const active = Boolean(extras[item.id]);
@@ -116,6 +118,9 @@ export default function ProductPage({ id, shop }) {
           </div>
         </section>
       )}
+
+      </div>
+      </div>
 
       <div className="cs-bottombar">
         <div style={{ display: 'flex', alignItems: 'center', border: '2px solid #3B1A12', borderRadius: 999 }}>

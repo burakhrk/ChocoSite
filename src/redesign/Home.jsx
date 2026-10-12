@@ -63,7 +63,7 @@ export default function RedesignHome({ shop }) {
   };
 
   const tickerItems = [site.heroSubtitle, site.menuBranchLine, 'Kişiye özel not kartı'];
-  const band = `${site.marquee} ✦ `.repeat(3);
+  const band = `${site.marquee} ✦ `.repeat(6);
 
   return (
     <div className="cs-page">
@@ -79,25 +79,31 @@ export default function RedesignHome({ shop }) {
           </div>
         </div>
 
-        <header style={{ position: 'sticky', top: 0, zIndex: 30, display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', background: '#FFD45C' }}>
-          <button type="button" className="cs-iconbtn" aria-label="Kategoriler" onClick={scrollTo(catsRef)}>
+        <header style={{ position: 'sticky', top: 0, zIndex: 30, display: 'flex', alignItems: 'center', gap: 6, padding: '8px var(--gutter-tight)', background: '#FFD45C' }}>
+          <button type="button" className="cs-iconbtn cs-mobile-only" aria-label="Kategoriler" onClick={scrollTo(catsRef)}>
             <Menu size={26} strokeWidth={2.4} aria-hidden="true" />
           </button>
           <button type="button" className="cs-display" onClick={toTop} style={{ flex: 1, textAlign: 'left', border: 0, background: 'transparent', color: '#3B1A12', fontSize: 26, padding: 0 }}>
             ChocoSite
           </button>
-          <button type="button" className="cs-iconbtn" aria-label="Ürünlere git" onClick={scrollTo(productsRef)}>
+          <nav className="cs-desktop-nav" aria-label="Üst gezinme">
+            <button type="button" onClick={scrollTo(catsRef)}>Kategoriler</button>
+            <button type="button" onClick={scrollTo(productsRef)}>Ürünler</button>
+            <button type="button" onClick={scrollTo(trackRef)}>Sipariş takibi</button>
+            <a href={waLink(whatsapp.order)} target="_blank" rel="noreferrer">WhatsApp</a>
+          </nav>
+          <button type="button" className="cs-iconbtn cs-mobile-only" aria-label="Ürünlere git" onClick={scrollTo(productsRef)}>
             <Search size={24} strokeWidth={2.4} aria-hidden="true" />
           </button>
           <CartBadge count={count} bumpKey={bumpKey} />
         </header>
 
-        <section style={{ position: 'relative', background: '#FFD45C', padding: '18px 20px 56px' }}>
+        <section className="cs-hero" style={{ position: 'relative', background: '#FFD45C', padding: '18px var(--gutter) 56px' }}>
           <div className="cs-rv" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 999, background: '#FFFDF8', fontSize: 13, fontWeight: 600 }}>
             <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: '#D8323C' }} />
             {site.menuTagline}
           </div>
-          <h1 className="cs-rv cs-display" style={{ '--d': '80ms', marginTop: 14, fontSize: 46, lineHeight: 1.02, letterSpacing: '-.01em' }}>
+          <h1 className="cs-rv cs-display cs-hero-title" style={{ '--d': '80ms', marginTop: 14, lineHeight: 1.02, letterSpacing: '-.01em' }}>
             Küçük anlar, hayatı{' '}
             <span style={{ position: 'relative', display: 'inline-block', color: '#D8323C' }}>
               tatlandırır.
@@ -106,11 +112,11 @@ export default function RedesignHome({ shop }) {
               </svg>
             </span>
           </h1>
-          <p className="cs-rv" style={{ '--d': '160ms', marginTop: 20, maxWidth: 300, fontSize: 17, color: '#5A2E22' }}>
+          <p className="cs-rv cs-hero-lead" style={{ '--d': '160ms', marginTop: 20, color: '#5A2E22' }}>
             {site.heroTitle}
           </p>
 
-          <div style={{ position: 'relative', height: 350, marginTop: 26 }}>
+          <div className="cs-hero-art" style={{ position: 'relative', height: 350, marginTop: 26 }}>
             <div className="cs-hero-back cs-scallop" aria-hidden="true" style={{ position: 'absolute', left: '50%', top: 14, width: 308, height: 308, marginLeft: -154, background: '#FF9EC0' }} />
             <div className="cs-hero-pic" style={{ position: 'absolute', left: '50%', top: 10, width: 308, height: 308, marginLeft: -154 }}>
               <div className="cs-rv cs-scallop" style={{ '--r': '-14deg', width: 308, height: 308, background: '#FFE1EC' }}>
@@ -143,7 +149,7 @@ export default function RedesignHome({ shop }) {
             </div>
           </div>
 
-          <div className="cs-rv" style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+          <div className="cs-rv cs-hero-cta" style={{ display: 'flex', gap: 10, marginTop: 12 }}>
             <button type="button" onClick={scrollTo(productsRef)} style={{ flex: 1, minHeight: 56, border: 0, borderRadius: 999, background: '#3B1A12', color: '#FFD45C', fontWeight: 700, fontSize: 17 }}>
               Hediyeni seç
             </button>
@@ -153,9 +159,9 @@ export default function RedesignHome({ shop }) {
           </div>
         </section>
 
-        <section style={{ position: 'relative', padding: '0 20px 34px' }}>
+        <section style={{ position: 'relative', padding: '0 var(--gutter) 34px' }}>
           <Drip color="#FFD45C" />
-          <div className="cs-rv" style={{ '--r': '3deg', marginTop: -44, position: 'relative', zIndex: 2, padding: 16, borderRadius: 26, background: '#FFFDF8', border: '2px solid #3B1A12', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="cs-rv cs-delivery-card" style={{ '--r': '3deg', marginTop: -44, position: 'relative', zIndex: 2, padding: 16, borderRadius: 26, background: '#FFFDF8', border: '2px solid #3B1A12', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
               <span style={{ fontWeight: 700 }}>Nereye gönderelim?</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#2F6B2A' }}>
@@ -168,15 +174,15 @@ export default function RedesignHome({ shop }) {
         </section>
 
         <section ref={catsRef} style={{ padding: '6px 0 40px', scrollMarginTop: 60 }}>
-          <div style={{ padding: '0 20px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
-            <h2 className="cs-rv cs-display" style={{ fontSize: 32, lineHeight: 1.05 }}>Kime, ne için?</h2>
-            <span className="cs-rv cs-hand" aria-hidden="true" style={{ '--d': '120ms', fontSize: 22, color: '#D8323C', rotate: '-6deg', whiteSpace: 'nowrap' }}>
+          <div style={{ padding: '0 var(--gutter)', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
+            <h2 className="cs-rv cs-display cs-h2" style={{ lineHeight: 1.05 }}>Kime, ne için?</h2>
+            <span className="cs-rv cs-hand cs-mobile-only" aria-hidden="true" style={{ '--d': '120ms', fontSize: 22, color: '#D8323C', rotate: '-6deg', whiteSpace: 'nowrap' }}>
               kaydır →
             </span>
           </div>
-          <div className="cs-hs" style={{ gap: 14, scrollSnapType: 'x mandatory', padding: '20px 20px 6px', scrollPaddingLeft: 20 }}>
+          <div className="cs-hs cs-cats" style={{ gap: 14, scrollSnapType: 'x mandatory', padding: '20px var(--gutter) 6px', scrollPaddingLeft: 20 }}>
             {CATEGORY_TILES.map((tile, index) => (
-              <button key={tile.label} type="button" className="cs-rv" onClick={() => pickCategory(tile.label)} style={{ '--d': `${index * 90}ms`, '--r': index % 2 ? '6deg' : '-6deg', flex: 'none', width: 184, scrollSnapAlign: 'start', border: 0, padding: 0, background: 'transparent', color: '#3B1A12', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button key={tile.label} type="button" className="cs-rv cs-cat-tile" onClick={() => pickCategory(tile.label)} style={{ '--d': `${index * 90}ms`, '--r': index % 2 ? '6deg' : '-6deg', scrollSnapAlign: 'start', border: 0, padding: 0, background: 'transparent', color: '#3B1A12', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <span style={{ height: 216, borderRadius: 22, display: 'grid', placeItems: 'center', background: tile.bg }}>
                   <span className={index % 2 ? 'cs-arch' : 'cs-scallop'} style={{ width: 132, height: 154, overflow: 'hidden', background: '#fff', display: 'block' }}>
                     <img src={tile.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -193,28 +199,28 @@ export default function RedesignHome({ shop }) {
             <div className="cs-band-a">{band}</div>
           </div>
           <div style={{ rotate: '2deg', background: '#FF9EC0', color: '#3B1A12', padding: '12px 0', margin: '-6px -30px 0' }}>
-            <div className="cs-band-b">{'çikolata ♥ pasta ♥ çiçek ♥ balon ♥ '.repeat(3)}</div>
+            <div className="cs-band-b">{'çikolata ♥ pasta ♥ çiçek ♥ balon ♥ '.repeat(8)}</div>
           </div>
         </div>
 
-        <section ref={productsRef} style={{ background: '#FFE1EC', padding: '0 20px 56px', scrollMarginTop: 60 }}>
+        <section ref={productsRef} style={{ background: '#FFE1EC', padding: '0 var(--gutter) 56px', scrollMarginTop: 60 }}>
           <Drip color="#FFFDF8" />
           <div style={{ position: 'relative', paddingTop: 30 }}>
-            <h2 className="cs-rv cs-display" style={{ fontSize: 36, lineHeight: 1.02, maxWidth: 240 }}>{site.sectionTitle}</h2>
+            <h2 className="cs-rv cs-display cs-h2" style={{ lineHeight: 1.02, maxWidth: 240 }}>{site.sectionTitle}</h2>
             <div className="cs-pop" aria-hidden="true" style={{ '--d': '200ms', position: 'absolute', right: 0, top: 16 }}>
               <div className="cs-stamp cs-hand" style={{ width: 84, height: 84, rotate: '12deg', background: '#FFD45C', display: 'grid', placeItems: 'center', textAlign: 'center', fontSize: 21, lineHeight: 0.95 }}>
                 çok<br />sevilen
               </div>
             </div>
           </div>
-          <div className="cs-hs" style={{ gap: 8, margin: '22px -20px 0', padding: '6px 20px 10px' }}>
+          <div className="cs-hs" style={{ gap: 8, margin: '22px calc(var(--gutter) * -1) 0', padding: '6px var(--gutter) 10px' }}>
             {chips.map((name) => (
               <button key={name} type="button" className={`cs-chip${category === name ? ' cs-active' : ''}`} aria-pressed={category === name} onClick={() => setCategory(name)}>
                 {name}
               </button>
             ))}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14, marginTop: 16, alignItems: 'start' }}>
+          <div className="cs-grid" style={{ marginTop: 16 }}>
             {shown.map((product, index) => {
               const image = primaryImage(product);
               return (
@@ -245,12 +251,12 @@ export default function RedesignHome({ shop }) {
           </div>
         </section>
 
-        <section data-sp="1" style={{ position: 'relative', background: '#3B1A12', color: '#FFF6E0', padding: '0 24px 60px' }}>
+        <section data-sp="1" style={{ position: 'relative', background: '#3B1A12', color: '#FFF6E0', padding: '0 var(--gutter) 60px' }}>
           <Drip color="#FFE1EC" />
-          <h2 className="cs-rv cs-display" style={{ marginTop: 40, fontSize: 36, lineHeight: 1.02, color: '#FFD45C' }}>
+          <h2 className="cs-rv cs-display cs-h2" style={{ marginTop: 40, lineHeight: 1.02, color: '#FFD45C' }}>
             Üç adımda<br />mutluluk
           </h2>
-          <div style={{ position: 'relative', marginTop: 30, display: 'flex', flexDirection: 'column', gap: 46 }}>
+          <div className="cs-narrow" style={{ position: 'relative', marginTop: 30, display: 'flex', flexDirection: 'column', gap: 46 }}>
             <svg aria-hidden="true" viewBox="0 0 340 470" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
               <path className="cs-draw" pathLength="1" d="M40 30C300 30 320 150 250 190S20 220 60 330s200 60 240 110" fill="none" stroke="#FF9EC0" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
             </svg>
@@ -271,10 +277,11 @@ export default function RedesignHome({ shop }) {
           </div>
         </section>
 
-        <section data-sp="1" style={{ background: '#FFD45C', padding: '0 20px 56px', position: 'relative' }}>
+        <section data-sp="1" style={{ background: '#FFD45C', padding: '0 var(--gutter) 56px', position: 'relative' }}>
           <Drip color="#3B1A12" />
-          <h2 className="cs-rv cs-display" style={{ marginTop: 40, fontSize: 36, lineHeight: 1.02 }}>İçinden geleni yaz</h2>
+          <h2 className="cs-rv cs-display cs-h2" style={{ marginTop: 40, lineHeight: 1.02 }}>İçinden geleni yaz</h2>
           <p className="cs-rv" style={{ '--d': '80ms', marginTop: 10, color: '#5A2E22' }}>Notun WhatsApp siparişine eklenir, kutunun içinde gider.</p>
+          <div className="cs-split">
           <div style={{ padding: '34px 14px 30px' }}>
             <div className="cs-tilt">
               <div className="cs-rv" style={{ '--r': '-12deg', position: 'relative', background: '#FFFDF8', borderRadius: 10, padding: '26px 22px 20px', minHeight: 190, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 18, boxShadow: '0 18px 0 -8px #F0B93A' }}>
@@ -292,7 +299,7 @@ export default function RedesignHome({ shop }) {
           <div className="cs-rv" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <label htmlFor="cs-note" style={{ fontWeight: 700, fontSize: 15 }}>Kart notun</label>
             <textarea id="cs-note" rows={2} maxLength={NOTE_MAX} placeholder="Örn. İyi ki doğdun canım!" value={note} onChange={(event) => setNote(event.target.value)} style={{ width: '100%', padding: '14px 16px', borderRadius: 18, border: '2px solid #3B1A12', background: '#FFFDF8', color: '#3B1A12', font: '500 16px Outfit, sans-serif', resize: 'none' }} />
-            <div className="cs-hs" style={{ gap: 8, margin: '0 -20px', padding: '4px 20px' }}>
+            <div className="cs-hs" style={{ gap: 8, margin: '0 calc(var(--gutter) * -1)', padding: '4px var(--gutter)' }}>
               {NOTE_PRESETS.map((preset) => (
                 <button key={preset} type="button" className="cs-chip" onClick={() => setNote(preset)}>
                   {preset}
@@ -300,15 +307,18 @@ export default function RedesignHome({ shop }) {
               ))}
             </div>
           </div>
+          </div>
         </section>
 
-        <section data-sp="1" style={{ padding: '0 20px 50px' }}>
+        <section data-sp="1" style={{ padding: '0 var(--gutter) 50px' }}>
           <Drip color="#FFD45C" />
-          <div className="cs-rv cs-arch" style={{ '--r': '4deg', marginTop: 40, height: 360, overflow: 'hidden', background: '#FFE1EC' }}>
+          <div className="cs-split">
+          <div className="cs-rv cs-arch cs-about-pic" style={{ '--r': '4deg', marginTop: 40, height: 360, overflow: 'hidden', background: '#FFE1EC' }}>
             <img className="cs-plx" src={heroPhoto} alt="ChocoSite kutusunun içindeki pasta, çikolata ve makaronlar" loading="lazy" style={{ width: '100%', height: '125%', objectFit: 'cover', display: 'block' }} />
           </div>
+          <div>
           <p className="cs-rv cs-hand" style={{ marginTop: 26, fontSize: 24, color: '#D8323C' }}>{site.aboutKicker}</p>
-          <h2 className="cs-rv cs-display" style={{ marginTop: 2, fontSize: 32, lineHeight: 1.05 }}>{site.aboutTitle}</h2>
+          <h2 className="cs-rv cs-display cs-h2" style={{ marginTop: 2, lineHeight: 1.05 }}>{site.aboutTitle}</h2>
           <p className="cs-rv" style={{ marginTop: 14, color: '#6B4A40' }}>{site.aboutText}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 20 }}>
             {site.aboutFeatures.map((feature, index) => (
@@ -317,12 +327,14 @@ export default function RedesignHome({ shop }) {
               </span>
             ))}
           </div>
+          </div>
+          </div>
         </section>
 
-        <section ref={trackRef} style={{ padding: '0 20px 56px', scrollMarginTop: 70 }}>
-          <div className="cs-rv" style={{ '--r': '-3deg', padding: '26px 20px', borderRadius: 30, background: checker('#E3CDF4', '#F6ECFD') }}>
+        <section ref={trackRef} style={{ padding: '0 var(--gutter) 56px', scrollMarginTop: 70 }}>
+          <div className="cs-rv cs-narrow" style={{ '--r': '-3deg', padding: '26px 20px', borderRadius: 30, background: checker('#E3CDF4', '#F6ECFD') }}>
             <form onSubmit={trackOrder} style={{ background: '#FFFDF8', borderRadius: 22, padding: '22px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <h2 className="cs-display" style={{ fontSize: 28, lineHeight: 1.05 }}>Siparişim nerede?</h2>
+              <h2 className="cs-display cs-h2" style={{ lineHeight: 1.05 }}>Siparişim nerede?</h2>
               <p style={{ fontSize: 15, color: '#6B4A40' }}>{site.trackHint}</p>
               <label htmlFor="cs-track" style={{ fontWeight: 700, fontSize: 14 }}>Sipariş numarası</label>
               <input id="cs-track" type="text" value={orderNo} onChange={(event) => setOrderNo(event.target.value)} placeholder={site.trackPlaceholder} style={{ width: '100%', height: 52, padding: '0 16px', borderRadius: 16, border: '2px solid #3B1A12', background: '#fff', color: '#3B1A12', font: '600 16px Outfit, sans-serif' }} />
@@ -333,7 +345,7 @@ export default function RedesignHome({ shop }) {
           </div>
         </section>
 
-        <footer style={{ background: '#3B1A12', color: '#FFF6E0', padding: '0 20px 40px' }}>
+        <footer style={{ background: '#3B1A12', color: '#FFF6E0', padding: '0 var(--gutter) 40px' }}>
           <Drip color="#FFFDF8" />
           <div className="cs-rv cs-display" style={{ marginTop: 36, fontSize: 68, lineHeight: 0.9, color: '#FFD45C', letterSpacing: '-.02em' }}>
             Choco<br />Site
@@ -356,12 +368,12 @@ export default function RedesignHome({ shop }) {
 
         <div style={{ position: 'sticky', bottom: 0, zIndex: 40, display: 'flex', flexDirection: 'column' }}>
           {count > 0 && (
-            <a href={CART_HREF} className="cs-slideup" style={{ margin: '0 12px 8px', minHeight: 54, padding: '0 8px 0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderRadius: 999, background: '#D8323C', color: '#fff', fontWeight: 700 }}>
+            <a href={CART_HREF} className="cs-slideup cs-minicart" style={{ margin: '0 12px 8px', minHeight: 54, padding: '0 8px 0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderRadius: 999, background: '#D8323C', color: '#fff', fontWeight: 700 }}>
               <span>{count} ürün · {formatPrice(total)}</span>
               <span style={{ height: 40, padding: '0 16px', display: 'inline-flex', alignItems: 'center', borderRadius: 999, background: '#fff', color: '#3B1A12' }}>Sepete git</span>
             </a>
           )}
-          <nav aria-label="Ana gezinme" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', alignItems: 'end', padding: '6px 8px 10px', background: '#FFFDF8', borderTop: '2px solid #3B1A12', borderRadius: '24px 24px 0 0' }}>
+          <nav className="cs-tabbar" aria-label="Ana gezinme" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', alignItems: 'end', padding: '6px 8px 10px', background: '#FFFDF8', borderTop: '2px solid #3B1A12', borderRadius: '24px 24px 0 0' }}>
             <button type="button" className="cs-tab" onClick={toTop}>
               <HomeIcon size={24} aria-hidden="true" />
               Ana sayfa
