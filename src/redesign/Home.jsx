@@ -1,19 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Home as HomeIcon, LayoutGrid, MapPin, Menu, MessageCircle, Plus, Search, ShoppingBag, Truck } from 'lucide-react';
-import './redesign.css';
 import { ASSETS, formatPrice, primaryImage, useStore } from '../store.jsx';
 import heroPhoto from '../assets/Images/chocopack.png';
-
-const WHATSAPP_LINK = 'https://wa.me/905414015262';
-const waLink = (text) => `${WHATSAPP_LINK}?text=${encodeURIComponent(text)}`;
+import { CART_HREF, CartBadge, Drip, NOTE_MAX, NOTE_PRESETS, ZonePicker, checker, isIllustration, productHref, useScrollMotion, waLink } from './shared.jsx';
 
 const ALL = 'Tümü';
-const NOTE_MAX = 90;
-const NOTE_PRESETS = ['İyi ki doğdun!', 'Teşekkür ederim', 'Seni çok seviyorum', 'Geçmiş olsun'];
-
-const checker = (color, ground) =>
-  `conic-gradient(from 45deg, ${color} 25%, #0000 0 50%, ${color} 0 75%, #0000 0) 0 0/30px 30px, ${ground}`;
-
 const CATEGORY_TILES = [
   { label: 'Doğum Günü', image: ASSETS.cake, bg: checker('#FFE08A', '#FFF6D6') },
   { label: 'Sevgiliye Özel', image: ASSETS.balloons, bg: checker('#FFC2D8', '#FFEEF4') },
@@ -33,71 +24,7 @@ const STEPS = [
 
 const FEATURE_TONES = ['#BFE3A2', '#FF9EC0', '#BFE0F2'];
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-
-const isIllustration = (src) => /svg/i.test(src);
-
-const Drip = ({ color }) => <div className="cs-drip" aria-hidden="true" style={{ '--c': color, margin: '0 -24px' }} />;
-
-// Görünürlük ve kaydırma animasyonlarını kök öğeye bağlar.
-const useScrollMotion = (rootRef, deps) => {
-  const tickRef = useRef(() => {});
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return undefined;
-    root.classList.add('cs-on');
-
-    let frame = 0;
-    const tick = () => {
-      frame = 0;
-      const height = window.innerHeight || 800;
-      const viewport = Math.min(height, 900);
-      root.style.setProperty('--sy', clamp(window.scrollY, 0, 700).toFixed(1));
-      root.querySelectorAll('[data-sp]').forEach((element) => {
-        const box = element.getBoundingClientRect();
-        const progress = clamp((viewport - box.top) / (viewport + box.height), 0, 1);
-        element.style.setProperty('--p', progress.toFixed(3));
-      });
-      root.querySelectorAll('.cs-rv:not(.cs-in), .cs-pop:not(.cs-in)').forEach((element) => {
-        const box = element.getBoundingClientRect();
-        if (box.top < height * 0.94 && box.bottom > 0) element.classList.add('cs-in');
-      });
-    };
-    tickRef.current = tick;
-    const onScroll = () => {
-      if (!frame) frame = window.requestAnimationFrame(tick);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    tick();
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      window.cancelAnimationFrame(frame);
-      root.classList.remove('cs-on');
-    };
-  }, [rootRef]);
-
-  useEffect(() => {
-    tickRef.current();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-};
-
-const cartText = (lines, total, zone, note, intro) =>
-  [
-    intro,
-    ...lines.map(({ product, qty }) => `- ${product.name} x${qty} (${formatPrice(product.price * qty)})`),
-    `Toplam: ${formatPrice(total)}`,
-    `Teslimat yeri: ${zone}`,
-    note ? `Kart notu: ${note}` : '',
-  ]
-    .filter(Boolean)
-    .join('\n');
-
-export default function RedesignHome() {
+export default function RedesignHome({ shop }) {
   const { state } = useStore();
   const { site, whatsapp } = state;
   const rootRef = useRef(null);
@@ -105,24 +32,18 @@ export default function RedesignHome() {
   const catsRef = useRef(null);
   const trackRef = useRef(null);
 
+  const { products, count, total, bumpKey } = shop;
   const zones = site.branches.map((branch) => branch.name);
-  const [zone, setZone] = useState(zones[0] || '');
+  const { zone, note } = shop.delivery;
+  const setNote = (value) => shop.setDelivery({ note: value });
   const [category, setCategory] = useState(ALL);
-  const [cart, setCart] = useState({});
-  const [bumpKey, setBumpKey] = useState(0);
-  const [note, setNote] = useState('');
   const [orderNo, setOrderNo] = useState('');
 
-  const products = useMemo(() => state.products.filter((product) => product.active), [state.products]);
   const chips = useMemo(() => {
     const used = state.categories.filter((name) => products.some((product) => product.categories.includes(name)));
     return [ALL, ...used];
   }, [state.categories, products]);
   const shown = category === ALL ? products : products.filter((product) => product.categories.includes(category));
-
-  const lines = products.filter((product) => cart[product.id]).map((product) => ({ product, qty: cart[product.id] }));
-  const count = lines.reduce((sum, line) => sum + line.qty, 0);
-  const total = lines.reduce((sum, line) => sum + line.product.price * line.qty, 0);
 
   useScrollMotion(rootRef, [category, shown.length]);
 
@@ -134,11 +55,6 @@ export default function RedesignHome() {
     scrollTo(productsRef)();
   };
 
-  const addToCart = (product) => {
-    setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + 1 }));
-    setBumpKey((key) => key + 1);
-  };
-
   const trackOrder = (event) => {
     event.preventDefault();
     const value = orderNo.trim();
@@ -146,7 +62,6 @@ export default function RedesignHome() {
     window.open(waLink(whatsapp.tracking.replace('{SIPARIS_NO}', value)), '_blank', 'noopener,noreferrer');
   };
 
-  const orderLink = waLink(count ? cartText(lines, total, zone, note, whatsapp.cartIntro) : whatsapp.order);
   const tickerItems = [site.heroSubtitle, site.menuBranchLine, 'Kişiye özel not kartı'];
   const band = `${site.marquee} ✦ `.repeat(3);
 
@@ -174,12 +89,7 @@ export default function RedesignHome() {
           <button type="button" className="cs-iconbtn" aria-label="Ürünlere git" onClick={scrollTo(productsRef)}>
             <Search size={24} strokeWidth={2.4} aria-hidden="true" />
           </button>
-          <a href={orderLink} target="_blank" rel="noreferrer" aria-label={`Sepet, ${count} ürün`} style={{ position: 'relative', width: 44, height: 44, display: 'grid', placeItems: 'center', borderRadius: '50%', background: '#3B1A12', color: '#FFD45C' }}>
-            <ShoppingBag size={22} strokeWidth={2.2} aria-hidden="true" />
-            <span key={bumpKey} className={count ? 'cs-bump' : ''} style={{ position: 'absolute', top: -4, right: -4, minWidth: 20, height: 20, padding: '0 4px', borderRadius: 10, background: '#D8323C', color: '#fff', fontSize: 12, fontWeight: 700, display: 'grid', placeItems: 'center' }}>
-              {count}
-            </span>
-          </a>
+          <CartBadge count={count} bumpKey={bumpKey} />
         </header>
 
         <section style={{ position: 'relative', background: '#FFD45C', padding: '18px 20px 56px' }}>
@@ -253,13 +163,7 @@ export default function RedesignHome() {
                 Bugün teslim
               </span>
             </div>
-            <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: '#FFE1EC' }}>
-              {zones.map((name) => (
-                <button key={name} type="button" className={`cs-seg${zone === name ? ' cs-active' : ''}`} aria-pressed={zone === name} onClick={() => setZone(name)}>
-                  {name}
-                </button>
-              ))}
-            </div>
+            <ZonePicker zones={zones} zone={zone} onChange={(name) => shop.setDelivery({ zone: name })} />
           </div>
         </section>
 
@@ -315,21 +219,23 @@ export default function RedesignHome() {
               const image = primaryImage(product);
               return (
                 <article key={product.id} className="cs-rv" style={{ '--d': `${(index % 2) * 110}ms`, '--r': index % 2 ? '5deg' : '-5deg', marginTop: index % 2 ? 26 : 0, position: 'relative', background: '#FFFDF8', borderRadius: 26, padding: '10px 10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <div className={index % 3 === 1 ? 'cs-scallop' : 'cs-arch'} style={{ aspectRatio: '1 / 1.15', overflow: 'hidden', background: CARD_TONES[index % CARD_TONES.length] }}>
+                  <a href={productHref(product)} className={index % 3 === 1 ? 'cs-scallop' : 'cs-arch'} style={{ display: 'block', aspectRatio: '1 / 1.15', overflow: 'hidden', background: CARD_TONES[index % CARD_TONES.length] }}>
                     <img src={image} alt={product.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', mixBlendMode: isIllustration(image) ? 'multiply' : 'normal' }} />
-                  </div>
+                  </a>
                   {product.badge && (
                     <span className="cs-stamp" style={{ position: 'absolute', top: 2, left: 2, width: 52, height: 52, rotate: '-12deg', background: '#D8323C', color: '#fff', fontWeight: 700, fontSize: 14, display: 'grid', placeItems: 'center' }}>
                       {product.badge.split(' ')[0]}
                     </span>
                   )}
-                  <h3 style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.25, minHeight: 38, padding: '0 4px' }}>{product.name}</h3>
+                  <h3 style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.25, minHeight: 38, padding: '0 4px' }}>
+                    <a href={productHref(product)}>{product.name}</a>
+                  </h3>
                   <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6, paddingLeft: 4 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
                       {product.oldPrice > 0 && <span style={{ fontSize: 13, color: '#6B4A40', textDecoration: 'line-through' }}>{formatPrice(product.oldPrice)}</span>}
                       <span className="cs-display" style={{ fontSize: 20 }}>{formatPrice(product.price)}</span>
                     </div>
-                    <button type="button" className="cs-add" aria-label={`${product.name} sepete ekle`} onClick={() => addToCart(product)}>
+                    <button type="button" className="cs-add" aria-label={`${product.name} sepete ekle`} onClick={() => shop.add(product)}>
                       <Plus size={20} strokeWidth={3} aria-hidden="true" />
                     </button>
                   </div>
@@ -443,16 +349,16 @@ export default function RedesignHome() {
           <a className="cs-display" href={`tel:+9${site.phone.replace(/\D/g, '')}`} style={{ display: 'block', marginTop: 22, fontSize: 30, color: '#FFF6E0' }}>
             {site.phone}
           </a>
-          <a href="#/" style={{ display: 'inline-block', marginTop: 18, padding: '12px 0', color: '#EBD9C6', textDecoration: 'underline' }}>
-            Mevcut tasarıma dön
+          <a href="#/admin" style={{ display: 'inline-block', marginTop: 18, padding: '12px 0', color: '#EBD9C6', textDecoration: 'underline' }}>
+            Yönetim
           </a>
         </footer>
 
         <div style={{ position: 'sticky', bottom: 0, zIndex: 40, display: 'flex', flexDirection: 'column' }}>
           {count > 0 && (
-            <a href={orderLink} target="_blank" rel="noreferrer" className="cs-slideup" style={{ margin: '0 12px 8px', minHeight: 54, padding: '0 8px 0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderRadius: 999, background: '#D8323C', color: '#fff', fontWeight: 700 }}>
+            <a href={CART_HREF} className="cs-slideup" style={{ margin: '0 12px 8px', minHeight: 54, padding: '0 8px 0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderRadius: 999, background: '#D8323C', color: '#fff', fontWeight: 700 }}>
               <span>{count} ürün · {formatPrice(total)}</span>
-              <span style={{ height: 40, padding: '0 16px', display: 'inline-flex', alignItems: 'center', borderRadius: 999, background: '#fff', color: '#3B1A12' }}>WhatsApp ile sipariş</span>
+              <span style={{ height: 40, padding: '0 16px', display: 'inline-flex', alignItems: 'center', borderRadius: 999, background: '#fff', color: '#3B1A12' }}>Sepete git</span>
             </a>
           )}
           <nav aria-label="Ana gezinme" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', alignItems: 'end', padding: '6px 8px 10px', background: '#FFFDF8', borderTop: '2px solid #3B1A12', borderRadius: '24px 24px 0 0' }}>
@@ -474,10 +380,10 @@ export default function RedesignHome() {
               <MapPin size={24} aria-hidden="true" />
               Takip
             </button>
-            <button type="button" className="cs-tab" onClick={scrollTo(productsRef)}>
+            <a className="cs-tab" href={CART_HREF}>
               <ShoppingBag size={24} aria-hidden="true" />
-              Ürünler
-            </button>
+              Sepet
+            </a>
           </nav>
         </div>
       </div>

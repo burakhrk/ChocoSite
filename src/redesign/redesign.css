@@ -230,6 +230,127 @@
   font-weight: 600;
 }
 
+.cs-day {
+  flex: none;
+  width: 64px;
+  min-height: 76px;
+  border-radius: 20px;
+  border: 2px solid var(--cocoa);
+  background: var(--paper);
+  color: var(--cocoa);
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.7, 0.64, 1), background 0.2s;
+}
+.cs-day.cs-active {
+  background: var(--pink);
+  transform: translateY(-6px) rotate(-4deg);
+}
+
+.cs-thumb {
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: #fff;
+}
+.cs-thumb.cs-active {
+  border-color: var(--cocoa);
+}
+
+.cs-extra {
+  flex: none;
+  width: 150px;
+  padding: 8px 8px 12px;
+  border-radius: 22px;
+  border: 2px solid var(--cocoa);
+  background: var(--paper);
+  color: var(--cocoa);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.7, 0.64, 1), background 0.2s;
+}
+.cs-extra.cs-active {
+  background: #bfe3a2;
+  transform: rotate(-2deg);
+}
+
+.cs-label {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.cs-field {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 2px solid var(--cocoa);
+  background: #fff;
+  color: var(--cocoa);
+  font: 500 16px Outfit, sans-serif;
+}
+
+.cs-qty {
+  width: 42px;
+  height: 46px;
+  border: 0;
+  background: transparent;
+  color: var(--cocoa);
+  display: grid;
+  place-items: center;
+}
+
+.cs-cta {
+  min-height: 54px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--cocoa);
+  color: var(--butter);
+  font-weight: 700;
+  font-size: 16px;
+}
+.cs-root a.cs-cta {
+  color: var(--butter);
+}
+
+.cs-bottombar {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 12px;
+  background: var(--paper);
+  border-top: 2px solid var(--cocoa);
+  border-radius: 24px 24px 0 0;
+}
+
+.cs-product-pic {
+  transform: rotate(calc(-3deg + var(--sy, 0) * 0.02deg)) scale(calc(1 - var(--sy, 0) * 0.0007));
+  transform-origin: 50% 100%;
+}
+.cs-stampspin {
+  transform: rotate(calc(12deg + var(--sy, 0) * 0.3deg));
+}
+
 @keyframes cs-spin {
   to {
     rotate: 360deg;

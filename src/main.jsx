@@ -19,7 +19,7 @@ import {
 import './styles.css';
 import { ASSETS, StoreProvider, formatPrice, primaryImage, useStore } from './store.jsx';
 import AdminApp from './admin/AdminApp.jsx';
-import RedesignHome from './redesign/Home.jsx';
+import RedesignApp from './redesign/App.jsx';
 
 const WHATSAPP_NUMBER = '905414015262';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
@@ -1067,17 +1067,15 @@ const isAdminRoute = () => {
   return window.location.hash.startsWith('#/admin');
 };
 
-const isRedesignRoute = () => window.location.hash.startsWith('#/yeni');
+// Eski tasarım yalnızca ?eski=1 ile açılır.
+const isLegacyRoute = () => new URLSearchParams(window.location.search).has('eski');
 
 function Root() {
   const [admin, setAdmin] = useState(isAdminRoute);
-  const [redesign, setRedesign] = useState(isRedesignRoute);
+  const [legacy] = useState(isLegacyRoute);
 
   useEffect(() => {
-    const sync = () => {
-      setAdmin(isAdminRoute());
-      setRedesign(isRedesignRoute());
-    };
+    const sync = () => setAdmin(isAdminRoute());
     window.addEventListener('hashchange', sync);
     window.addEventListener('popstate', sync);
     return () => {
@@ -1091,10 +1089,10 @@ function Root() {
     if (admin) window.scrollTo(0, 0);
   }, [admin]);
 
-  if (redesign && !admin) {
+  if (!legacy && !admin) {
     return (
       <StoreProvider>
-        <RedesignHome />
+        <RedesignApp />
       </StoreProvider>
     );
   }
