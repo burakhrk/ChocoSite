@@ -1,17 +1,17 @@
 import { useMemo, useRef, useState } from 'react';
 import { Home as HomeIcon, LayoutGrid, MapPin, Menu, MessageCircle, Plus, Search, ShoppingBag, Truck } from 'lucide-react';
-import { ASSETS, formatPrice, primaryImage, useStore } from '../store.jsx';
+import { formatPrice, primaryImage, useStore } from '../store.jsx';
 import heroPhoto from '../assets/Images/chocopack.png';
 import { CART_HREF, CartBadge, Drip, NOTE_MAX, NOTE_PRESETS, ZonePicker, checker, isIllustration, productHref, useScrollMotion, waLink } from './shared.jsx';
 
 const ALL = 'Tümü';
-const CATEGORY_TILES = [
-  { label: 'Doğum Günü', image: ASSETS.cake, bg: checker('#FFE08A', '#FFF6D6') },
-  { label: 'Sevgiliye Özel', image: ASSETS.balloons, bg: checker('#FFC2D8', '#FFEEF4') },
-  { label: 'Teşekkürler', image: ASSETS.flowers, bg: checker('#CDEBB5', '#F1FAE8') },
-  { label: 'Çocuğa Hediyeler', image: ASSETS['teddy-gift'], bg: checker('#BFE0F2', '#EDF7FC') },
-  { label: 'Kurumsal', image: ASSETS['chocolate-box'], bg: checker('#E3CDF4', '#F6ECFD') },
-  { label: 'Pasta', image: ASSETS.cheesecake, bg: checker('#FFE08A', '#FFF6D6') },
+const TILE_LIMIT = 6;
+const TILE_GROUNDS = [
+  checker('#FFE08A', '#FFF6D6'),
+  checker('#FFC2D8', '#FFEEF4'),
+  checker('#CDEBB5', '#F1FAE8'),
+  checker('#BFE0F2', '#EDF7FC'),
+  checker('#E3CDF4', '#F6ECFD'),
 ];
 
 const CARD_TONES = ['#FFE9A8', '#FFD0E0', '#D5EEC2', '#CFE8F5', '#EAD9F7'];
@@ -31,6 +31,7 @@ export default function RedesignHome({ shop }) {
   const productsRef = useRef(null);
   const catsRef = useRef(null);
   const trackRef = useRef(null);
+  const footerRef = useRef(null);
 
   const { products, count, total, bumpKey } = shop;
   const zones = site.branches.map((branch) => branch.name);
@@ -43,6 +44,12 @@ export default function RedesignHome({ shop }) {
     const used = state.categories.filter((name) => products.some((product) => product.categories.includes(name)));
     return [ALL, ...used];
   }, [state.categories, products]);
+  // Panelde sıralanan kategorilerden, ürünü olan ilk birkaçı vitrine çıkar.
+  const tiles = chips.slice(1, TILE_LIMIT + 1).map((name, index) => ({
+    label: name,
+    image: primaryImage(products.find((product) => product.categories.includes(name))),
+    bg: TILE_GROUNDS[index % TILE_GROUNDS.length],
+  }));
   const shown = category === ALL ? products : products.filter((product) => product.categories.includes(category));
 
   useScrollMotion(rootRef, [category, shown.length]);
@@ -53,6 +60,16 @@ export default function RedesignHome({ shop }) {
   const pickCategory = (name) => {
     setCategory(chips.includes(name) ? name : ALL);
     scrollTo(productsRef)();
+  };
+
+  // Paneldeki "#products" gibi adresler rota değiştirmeden ilgili bölüme kaydırır.
+  const footerTargets = { '#products': productsRef, '#cats': catsRef, '#track': trackRef, '#contact': footerRef };
+  const followFooterLink = (href) => (event) => {
+    if (!href.startsWith('#') || href.startsWith('#/')) return;
+    event.preventDefault();
+    const target = footerTargets[href];
+    if (target) scrollTo(target)();
+    else toTop();
   };
 
   const trackOrder = (event) => {
@@ -181,11 +198,11 @@ export default function RedesignHome({ shop }) {
             </span>
           </div>
           <div className="cs-hs cs-cats" style={{ gap: 14, scrollSnapType: 'x mandatory', padding: '20px var(--gutter) 6px', scrollPaddingLeft: 20 }}>
-            {CATEGORY_TILES.map((tile, index) => (
+            {tiles.map((tile, index) => (
               <button key={tile.label} type="button" className="cs-rv cs-cat-tile" onClick={() => pickCategory(tile.label)} style={{ '--d': `${index * 90}ms`, '--r': index % 2 ? '6deg' : '-6deg', scrollSnapAlign: 'start', border: 0, padding: 0, background: 'transparent', color: '#3B1A12', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <span style={{ height: 216, borderRadius: 22, display: 'grid', placeItems: 'center', background: tile.bg }}>
                   <span className={index % 2 ? 'cs-arch' : 'cs-scallop'} style={{ width: 132, height: 154, overflow: 'hidden', background: '#fff', display: 'block' }}>
-                    <img src={tile.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <img src={tile.image} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </span>
                 </span>
                 <span style={{ fontWeight: 600, fontSize: 17, textAlign: 'center' }}>{tile.label}</span>
@@ -341,11 +358,12 @@ export default function RedesignHome({ shop }) {
               <button type="submit" style={{ minHeight: 52, border: 0, borderRadius: 999, background: '#3B1A12', color: '#FFD45C', fontWeight: 700, fontSize: 16 }}>
                 {site.trackButton}
               </button>
+              {site.trackMeta && <p style={{ fontSize: 13, color: '#6B4A40', textAlign: 'center' }}>{site.trackMeta}</p>}
             </form>
           </div>
         </section>
 
-        <footer style={{ background: '#3B1A12', color: '#FFF6E0', padding: '0 var(--gutter) 40px' }}>
+        <footer ref={footerRef} style={{ background: '#3B1A12', color: '#FFF6E0', padding: '0 var(--gutter) 40px' }}>
           <Drip color="#FFFDF8" />
           <div className="cs-rv cs-display" style={{ marginTop: 36, fontSize: 68, lineHeight: 0.9, color: '#FFD45C', letterSpacing: '-.02em' }}>
             Choco<br />Site
@@ -361,6 +379,13 @@ export default function RedesignHome({ shop }) {
           <a className="cs-display" href={`tel:+9${site.phone.replace(/\D/g, '')}`} style={{ display: 'block', marginTop: 22, fontSize: 30, color: '#FFF6E0' }}>
             {site.phone}
           </a>
+          <nav aria-label="Alt bağlantılar" className="cs-footer-links">
+            {site.footerLinks.map((link, index) => (
+              <a key={index} href={link.href} onClick={followFooterLink(link.href)}>
+                {link.label}
+              </a>
+            ))}
+          </nav>
           <a href="#/admin" style={{ display: 'inline-block', marginTop: 18, padding: '12px 0', color: '#EBD9C6', textDecoration: 'underline' }}>
             Yönetim
           </a>
