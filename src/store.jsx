@@ -274,12 +274,6 @@ const DEFAULT_PAYMENTS = [
     tag: 'Yakında',
     note: 'Online ödeme altyapısı hazırlanıyor. Bu aşamada siparişiniz WhatsApp üzerinden tamamlanır.',
   },
-  {
-    id: 'transfer',
-    label: 'Havale / EFT',
-    tag: '',
-    note: 'Havale bilgileri sipariş onayında WhatsApp üzerinden paylaşılır.',
-  },
 ];
 
 export const DEFAULT_STATE = {
@@ -318,7 +312,7 @@ const normalizePayment = (method, index) => ({
 
 const normalizePayments = (value) => {
   const list = asArray(value, DEFAULT_PAYMENTS)
-    .filter((method) => method && method.id !== 'cod')
+    .filter((method) => method && method.id !== 'cod' && method.id !== 'transfer')
     .map(normalizePayment);
   return list.length ? list : DEFAULT_PAYMENTS.map(normalizePayment);
 };

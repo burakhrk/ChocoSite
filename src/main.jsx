@@ -27,11 +27,34 @@ const waLink = (text) => `${WHATSAPP_LINK}?text=${encodeURIComponent(text)}`;
 const trackingText = (orderNo, template) =>
   String(template || '{SIPARIS_NO}').replace('{SIPARIS_NO}', orderNo);
 
+const CONFETTI_COLORS = ['var(--pv-band)', 'var(--pv-hot-ink)', 'var(--pv-hot)', 'var(--pv-muted)'];
+
+const burstConfetti = (event) => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const button = event && event.currentTarget;
+  if (!button || typeof button.getBoundingClientRect !== 'function') return;
+  const rect = button.getBoundingClientRect();
+  const originX = rect.left + rect.width / 2;
+  const originY = rect.top + rect.height / 2;
+  for (let index = 0; index < 8; index += 1) {
+    const bit = document.createElement('span');
+    bit.className = 'confetti-bit';
+    bit.style.left = `${originX}px`;
+    bit.style.top = `${originY}px`;
+    bit.style.setProperty('--bit-angle', `${index * 45}deg`);
+    bit.style.background = CONFETTI_COLORS[index % CONFETTI_COLORS.length];
+    bit.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(bit);
+    window.setTimeout(() => bit.remove(), 760);
+  }
+};
+
 const deliveryEntries = (delivery) =>
   [
     ['Teslimat yeri', delivery.place],
     ['Teslimat saati', delivery.time],
     ['Ad Soyad', delivery.name],
+    ['Teslim edilecek kişi', delivery.recipient],
     ['Telefon', delivery.phone],
     ['Adres', delivery.address],
     ['Not', delivery.note],
@@ -45,7 +68,7 @@ const cartOrderText = (cart, total, delivery, intro) => {
     (item) => `- ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`,
   );
   const details = deliveryLines(delivery)
-    .filter((line) => line.startsWith('Teslimat'))
+    .filter((line) => line.startsWith('Teslimat') || line.startsWith('Teslim edilecek'))
     .join('\n');
   const tail = details ? `\n\n${details}` : '';
   return `${intro}\n${lines.join('\n')}\n\nAra toplam: ${formatPrice(total)}${tail}`;
@@ -83,10 +106,12 @@ function App() {
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [trackingOpen, setTrackingOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [welcome, setWelcome] = useState('hidden');
   const [delivery, setDelivery] = useState({
     place: '',
     time: '',
     name: '',
+    recipient: '',
     phone: '',
     address: '',
     note: '',
@@ -162,6 +187,48 @@ function App() {
 
   const toggleFavoritesOnly = () => setFavoritesOnly((value) => !value);
 
+  useEffect(() => {
+    if (!menuOpen && !cartOpen && !searchOpen && !trackingOpen && !checkoutOpen) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+      setMenuOpen(false);
+      setCartOpen(false);
+      setSearchOpen(false);
+      setTrackingOpen(false);
+      setCheckoutOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen, cartOpen, searchOpen, trackingOpen, checkoutOpen]);
+
+  const dismissWelcome = () => {
+    setWelcome((current) => (current === 'shown' ? 'leaving' : current));
+    window.setTimeout(() => setWelcome('hidden'), 260);
+  };
+
+  useEffect(() => {
+    let seen = false;
+    try {
+      seen = window.sessionStorage.getItem('chocosite.welcome.v1') === '1';
+    } catch {
+      seen = true;
+    }
+    if (seen) return undefined;
+    let exitTimer = 0;
+    const showTimer = window.setTimeout(() => {
+      try {
+        window.sessionStorage.setItem('chocosite.welcome.v1', '1');
+      } catch {
+      }
+      setWelcome('shown');
+      exitTimer = window.setTimeout(dismissWelcome, 5600);
+    }, 1100);
+    return () => {
+      window.clearTimeout(showTimer);
+      window.clearTimeout(exitTimer);
+    };
+  }, []);
+
   const clearFilters = () => {
     setFavoritesOnly(false);
     setActiveCategory('Tüm Ürünler');
@@ -218,7 +285,7 @@ function App() {
             </button>
             <button className="cart-button" onClick={() => setCartOpen(true)} aria-label="Sepet">
               <ShoppingBag size={21} />
-              <span>{cartCount}</span>
+              <span key={cartCount} aria-live="polite">{cartCount}</span>
             </button>
           </nav>
         </div>
@@ -236,20 +303,21 @@ function App() {
         <section className="hero">
           <div className="hero-stage">
             <div className="hero-copy">
+              <p className="eyebrow hero-eyebrow">El yapımı çikolata &amp; pasta</p>
               <h1>{site.heroTitle}</h1>
               <span>{site.heroSubtitle}</span>
+              <a className="scroll-cue" href="#products">
+                Keşfet <span aria-hidden="true">↓</span>
+              </a>
             </div>
-            <img
-              className="hero-illustration"
-              src={ASSETS['hero-chocolate']}
-              alt="ChocoSite hediye çikolata kutuları"
-            />
             <div className="hero-categories" aria-label="Öne çıkan kategoriler">
               {site.heroCards.map((card) => (
                 <button key={card.label} onClick={() => setActiveCategory(card.target)}>
                   <img
                     src={card.image.startsWith('asset:') ? ASSETS[card.image.slice(6)] : card.image}
                     alt={card.label}
+                    width={400}
+                    height={400}
                   />
                 </button>
               ))}
@@ -273,6 +341,7 @@ function App() {
         <section className="product-section" id="products">
           <div className="section-heading">
             <div className="section-ribbon">
+              <p className="eyebrow">Taze fırından</p>
               <h2>{site.sectionTitle}</h2>
             </div>
             <div className="filter-pills">
@@ -305,7 +374,7 @@ function App() {
               {filteredProducts.map((product) => (
                 <article className="product-card" key={product.id}>
                   <div className="product-media">
-                    <img src={product.image} alt={product.name} loading="lazy" />
+                    <img src={product.image} alt={product.name} width={600} height={648} loading="lazy" decoding="async" />
                     {product.badge && <span className="badge">{product.badge}</span>}
                     <button
                       className={`favorite-button ${favoriteIds.includes(product.id) ? 'active' : ''}`}
@@ -323,7 +392,14 @@ function App() {
                       {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
                       <strong>{formatPrice(product.price)}</strong>
                     </div>
-                    <button className="quick-add" onClick={() => addToCart(product)} aria-label={`${product.name} sepete ekle`}>
+                    <button
+                      className="quick-add"
+                      onClick={(event) => {
+                        burstConfetti(event);
+                        addToCart(product);
+                      }}
+                      aria-label={`${product.name} sepete ekle`}
+                    >
                       <ChevronRight size={18} />
                     </button>
                   </div>
@@ -338,11 +414,14 @@ function App() {
             <img
               src={ASSETS.cake}
               alt="Çikolatalı pasta hazırlığı"
+              width={800}
+              height={944}
               loading="lazy"
+              decoding="async"
             />
           </div>
           <div className="editorial-copy">
-            <p>{site.aboutKicker}</p>
+            <p className="eyebrow">{site.aboutKicker}</p>
             <h2>{site.aboutTitle}</h2>
             <span>{site.aboutText}</span>
             <div className="feature-list">
@@ -421,6 +500,21 @@ function App() {
         products={filteredProducts}
         addToCart={addToCart}
       />
+
+      {welcome !== 'hidden' && (
+        <div className={`welcome-toast${welcome === 'leaving' ? ' leaving' : ''}`} role="status">
+          <span className="welcome-dot" aria-hidden="true" />
+          <p>Hoş geldin! Bugünün tazeleri tezgâhta.</p>
+          <button
+            type="button"
+            className="welcome-close"
+            onClick={dismissWelcome}
+            aria-label="Karşılama mesajını kapat"
+          >
+            <X size={15} />
+          </button>
+        </div>
+      )}
 
       <a
         className="whatsapp-fab"
@@ -608,7 +702,7 @@ function CartDrawer({ open, close, cart, total, updateQuantity, delivery, setDel
             <div className="cart-items">
               {cart.map((item) => (
                 <div className="cart-item" key={item.id}>
-                  <img src={item.image} alt={item.name} />
+                   <img src={item.image} alt={item.name} width={84} height={94} />
                   <div>
                     <strong>{item.name}</strong>
                     <span>{formatPrice(item.price)}</span>
@@ -628,6 +722,15 @@ function CartDrawer({ open, close, cart, total, updateQuantity, delivery, setDel
 
             <div className="cart-form">
               <span className="cart-form-title">Teslimat bilgileri · opsiyonel</span>
+              <label className="field">
+                <span>Teslim alacak kişi</span>
+                <input
+                  value={delivery.recipient}
+                  onChange={(event) => setDeliveryField('recipient', event.target.value)}
+                  placeholder="Hediye teslim edilecek kişinin adı"
+                  autoComplete="off"
+                />
+              </label>
               <div className="cart-form-row">
                 <label className="field">
                   <span>Yer</span>
@@ -747,6 +850,15 @@ function CheckoutPanel({ open, close, cart, total, delivery, setDeliveryField })
               />
             </label>
             <label className="field">
+              <span>Teslim alacak kişi</span>
+              <input
+                value={delivery.recipient}
+                onChange={(event) => setDeliveryField('recipient', event.target.value)}
+                placeholder="Hediye teslim edilecek kişinin adı (opsiyonel)"
+                autoComplete="off"
+              />
+            </label>
+            <label className="field">
               <span>Adres</span>
               <textarea
                 rows={3}
@@ -783,7 +895,9 @@ function CheckoutPanel({ open, close, cart, total, delivery, setDeliveryField })
                 autoComplete="off"
               />
             </label>
-            <p className="field-hint">Yer ve saat opsiyoneldir; boş bırakılırsa mesaja eklenmez.</p>
+            <p className="field-hint">
+              Teslim edilecek kişi, yer ve saat opsiyoneldir; boş bırakılanlar mesaja eklenmez.
+            </p>
             <button type="submit" className="checkout-next">
               Ödeme bilgilerine geç
             </button>
@@ -933,7 +1047,7 @@ function SearchOverlay({ open, close, query, setQuery, products, addToCart }) {
                 close();
               }}
             >
-              <img src={product.image} alt="" />
+               <img src={product.image} alt="" width={62} height={62} />
               <span>{product.name}</span>
               <strong>{formatPrice(product.price)}</strong>
             </button>
