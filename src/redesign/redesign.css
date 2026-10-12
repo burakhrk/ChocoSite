@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Caprasimo&family=Caveat:wght@500;700&family=Outfit:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caprasimo&family=Caveat:wght@500;700&family=Fraunces:opsz,wght,SOFT@144,900,100&family=Outfit:wght@400;500;600;700&display=swap");
 
 .cs-page {
   min-height: 100vh;
@@ -41,9 +41,12 @@
   cursor: pointer;
 }
 
+/* Caprasimo'da ğ, İ, ş ve ₺ yok; bu harfler yumuşak ve kalın Fraunces'ten gelir. */
 .cs-display {
-  font-family: Caprasimo, serif;
+  font-family: Caprasimo, Fraunces, serif;
   font-weight: 400;
+  font-variation-settings: "SOFT" 100, "opsz" 144;
+  font-synthesis: none;
 }
 
 .cs-hand {
