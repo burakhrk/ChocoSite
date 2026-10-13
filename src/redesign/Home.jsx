@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Home as HomeIcon, LayoutGrid, MapPin, Menu, MessageCircle, Plus, Search, ShoppingBag } from 'lucide-react';
 import { formatPrice, primaryImage, trackingMessage, useStore } from '../store.jsx';
 import heroPhoto from '../assets/Images/chocopack.png';
@@ -24,6 +24,54 @@ const STEPS = [
 
 const FEATURE_TONES = ['#BFE3A2', '#FF9EC0', '#BFE0F2'];
 
+const LOOP_SPEED = 28; // saniyede piksel
+const LOOP_RESUME_DELAY = 2200;
+
+// Yatay şeridi yavaşça sonsuz döngüde kaydırır; dokununca durur, bırakınca devam eder.
+// Şerit içeriği iki kez basılmış olmalıdır: ikinci kopyanın başına gelince başa sarar.
+const useLoopingScroll = (trackRef, itemCount) => {
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || itemCount < 2) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    let frame = 0;
+    let last = 0;
+    let position = track.scrollLeft;
+    let pausedUntil = 0;
+
+    const step = (now) => {
+      frame = window.requestAnimationFrame(step);
+      const elapsed = Math.min(now - last, 64);
+      last = now;
+      const first = track.children[0];
+      const firstCopy = track.children[itemCount];
+      // Masaüstünde kopyalar gizlidir ve şerit kaymaz.
+      if (!first || !firstCopy || firstCopy.offsetParent === null) return;
+      if (now < pausedUntil) {
+        position = track.scrollLeft;
+        return;
+      }
+      const loopWidth = firstCopy.offsetLeft - first.offsetLeft;
+      position += (LOOP_SPEED * elapsed) / 1000;
+      if (position >= loopWidth) position -= loopWidth;
+      track.scrollLeft = position;
+    };
+
+    const pause = () => {
+      pausedUntil = performance.now() + LOOP_RESUME_DELAY;
+    };
+    const events = ['pointerdown', 'touchstart', 'touchmove', 'wheel'];
+    events.forEach((name) => track.addEventListener(name, pause, { passive: true }));
+    frame = window.requestAnimationFrame(step);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      events.forEach((name) => track.removeEventListener(name, pause));
+    };
+  }, [trackRef, itemCount]);
+};
+
 export default function RedesignHome({ shop }) {
   const { state } = useStore();
   const { site, whatsapp } = state;
@@ -31,6 +79,7 @@ export default function RedesignHome({ shop }) {
   const productsRef = useRef(null);
   const catsRef = useRef(null);
   const trackRef = useRef(null);
+  const tilesRef = useRef(null);
   const footerRef = useRef(null);
 
   const { products, count, total, bumpKey } = shop;
@@ -49,6 +98,7 @@ export default function RedesignHome({ shop }) {
     image: primaryImage(products.find((product) => product.categories.includes(name))),
     bg: TILE_GROUNDS[index % TILE_GROUNDS.length],
   }));
+  useLoopingScroll(tilesRef, tiles.length);
   const shown = category === ALL ? products : products.filter((product) => product.categories.includes(category));
 
   useScrollMotion(rootRef, [category, shown.length]);
@@ -186,9 +236,12 @@ export default function RedesignHome({ shop }) {
               kaydır →
             </span>
           </div>
-          <div className="cs-hs cs-cats" style={{ gap: 14, scrollSnapType: 'x mandatory', padding: '20px var(--gutter) 6px', scrollPaddingLeft: 20 }}>
-            {tiles.map((tile, index) => (
-              <button key={tile.label} type="button" className="cs-rv cs-cat-tile" onClick={() => pickCategory(tile.label)} style={{ '--d': `${index * 90}ms`, '--r': index % 2 ? '6deg' : '-6deg', scrollSnapAlign: 'start', border: 0, padding: 0, background: 'transparent', color: '#3B1A12', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div ref={tilesRef} className="cs-hs cs-cats" style={{ gap: 14, padding: '20px var(--gutter) 6px' }}>
+            {[...tiles, ...tiles].map((tile, position) => {
+              const index = position % tiles.length;
+              const copy = position >= tiles.length;
+              return (
+              <button key={`${tile.label}-${copy ? 'kopya' : 'asil'}`} type="button" className={`cs-rv cs-cat-tile${copy ? ' cs-mobile-only' : ''}`} aria-hidden={copy || undefined} tabIndex={copy ? -1 : undefined} onClick={() => pickCategory(tile.label)} style={{ '--d': `${index * 90}ms`, '--r': index % 2 ? '6deg' : '-6deg', border: 0, padding: 0, background: 'transparent', color: '#3B1A12', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <span style={{ height: 216, borderRadius: 22, display: 'grid', placeItems: 'center', background: tile.bg }}>
                   <span className={index % 2 ? 'cs-arch' : 'cs-scallop'} style={{ width: 132, height: 154, overflow: 'hidden', background: '#fff', display: 'block' }}>
                     <img src={tile.image} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -196,7 +249,8 @@ export default function RedesignHome({ shop }) {
                 </span>
                 <span style={{ fontWeight: 600, fontSize: 17, textAlign: 'center' }}>{tile.label}</span>
               </button>
-            ))}
+              );
+            })}
           </div>
         </section>
 
