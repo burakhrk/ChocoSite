@@ -27,6 +27,7 @@ import {
   Upload,
   X,
 } from 'lucide-react';
+import { uploadImage } from '../supabase.js';
 import {
   ASSETS,
   ASSET_LABELS,
@@ -39,8 +40,6 @@ import {
 } from '../store.jsx';
 import './admin.css';
 
-const SESSION_KEY = 'chocosite.admin.session';
-const CREDENTIALS = { id: 'admin', password: '123456' };
 const SITE_URL = `${window.location.origin}${import.meta.env.BASE_URL || '/'}`;
 
 const NAV = [
@@ -112,22 +111,17 @@ function Card({ title, hint, children, actions }) {
 }
 
 function AdminLogin({ onLogin }) {
-  const [id, setId] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
-    if (id.trim() === CREDENTIALS.id && password === CREDENTIALS.password) {
-      try {
-        window.sessionStorage.setItem(SESSION_KEY, '1');
-      } catch (sessionError) {
-        /* yoksay */
-      }
-      onLogin();
-      return;
-    }
-    setError('Kullanıcı adı veya şifre hatalı.');
+    setBusy(true);
+    const ok = await onLogin(email.trim(), password);
+    setBusy(false);
+    if (!ok) setError('E-posta veya şifre hatalı.');
   };
 
   return (
@@ -137,13 +131,14 @@ function AdminLogin({ onLogin }) {
         <h1>ChocoSite Yönetim</h1>
         <p>Ürünleri, metinleri ve WhatsApp şablonlarını buradan yönetin.</p>
         <label className="adm-field">
-          <span className="adm-label">Kullanıcı adı</span>
+          <span className="adm-label">E-posta</span>
           <input
-            value={id}
+            type="email"
+            value={email}
             autoComplete="username"
-            placeholder="admin"
+            required
             onChange={(event) => {
-              setId(event.target.value);
+              setEmail(event.target.value);
               setError('');
             }}
           />
@@ -154,7 +149,7 @@ function AdminLogin({ onLogin }) {
             type="password"
             value={password}
             autoComplete="current-password"
-            placeholder="••••••"
+            required
             onChange={(event) => {
               setPassword(event.target.value);
               setError('');
@@ -162,7 +157,7 @@ function AdminLogin({ onLogin }) {
           />
         </label>
         {error && <p className="adm-error">{error}</p>}
-        <button type="submit" className="adm-btn primary block">
+        <button type="submit" className="adm-btn primary block" disabled={busy}>
           <Lock size={16} /> Giriş yap
         </button>
         <a className="adm-login-back" href={SITE_URL}>
@@ -257,7 +252,7 @@ function ProductEditor({ product, categories, onClose, onSave, onDelete }) {
       const list = Array.from(files).slice(0, 6);
       const urls = [];
       for (const file of list) {
-        urls.push(await fileToDataUrl(file));
+        urls.push(await uploadImage(await fileToDataUrl(file)));
       }
       setForm((current) => ({ ...current, images: [...current.images, ...urls] }));
     } catch (error) {
@@ -1243,7 +1238,7 @@ function SettingsPage({ store, notify }) {
           />
         </div>
         <p className="adm-hint">
-          Depolama kullanımı: <strong>{usage} KB</strong> · Tarayıcı yerel verisinde tutulur.
+          Yerel önbellek: <strong>{usage} KB</strong> · İçerik ve fotoğraflar Supabase'de saklanır.
         </p>
       </Card>
 
@@ -1264,9 +1259,8 @@ function SettingsPage({ store, notify }) {
 
       <Card title="Giriş bilgileri">
         <p className="adm-hint">
-          Kullanıcı adı <strong>admin</strong> · Şifre <strong>123456</strong>. Bu bilgileri
-          değiştirmek için projedeki <code>src/admin/AdminApp.jsx</code> dosyasındaki
-          <code> CREDENTIALS </code> sabitini düzenleyin.
+          Giriş, Supabase'de tanımlı e-posta ve şifreyle yapılır. Yeni yönetici eklemek için
+          Supabase panelinde kullanıcı oluşturup e-postasını <code>admins</code> tablosuna ekleyin.
         </p>
       </Card>
     </div>
@@ -1275,13 +1269,6 @@ function SettingsPage({ store, notify }) {
 
 export default function AdminApp() {
   const store = useStore();
-  const [authed, setAuthed] = useState(() => {
-    try {
-      return window.sessionStorage.getItem(SESSION_KEY) === '1';
-    } catch (error) {
-      return false;
-    }
-  });
   const [page, setPage] = useState('dashboard');
   const [toast, setToast] = useState('');
   const toastTimer = useRef(null);
@@ -1292,18 +1279,13 @@ export default function AdminApp() {
     toastTimer.current = window.setTimeout(() => setToast(''), 2400);
   };
 
-  if (!authed) return <AdminLogin onLogin={() => setAuthed(true)} />;
+  if (!store.signedIn) return <AdminLogin onLogin={store.signIn} />;
 
   const statusLabel =
     store.status === 'saving' ? 'Kaydediliyor…' : store.status === 'error' ? 'Kaydedilemedi' : 'Kaydedildi';
 
   const logout = () => {
-    try {
-      window.sessionStorage.removeItem(SESSION_KEY);
-    } catch (error) {
-      /* yoksay */
-    }
-    setAuthed(false);
+    store.signOut();
     setPage('dashboard');
   };
 

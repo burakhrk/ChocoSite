@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { fetchContent, saveContent, signIn, signOut, watchSession } from './supabase.js';
 
 import chocolateBox from './assets/chocolate-box.svg';
 import cake from './assets/cake.svg';
@@ -358,10 +359,59 @@ const readStorage = () => {
 
 export const StoreContext = createContext(null);
 
+const writeStorage = (content) => {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+  } catch (error) {
+    /* önbellek dolu olabilir; asıl kayıt veritabanında */
+  }
+};
+
+// İçerik Supabase'de durur; localStorage yalnızca hızlı açılış için önbellektir.
 export function StoreProvider({ children }) {
   const [state, setState] = useState(() => readStorage() || DEFAULT_STATE);
   const [status, setStatus] = useState('saved');
+  const [signedIn, setSignedIn] = useState(false);
   const timerRef = useRef(null);
+  const stateRef = useRef(state);
+  const signedInRef = useRef(false);
+  const remoteEmptyRef = useRef(false);
+
+  stateRef.current = state;
+
+  // Veritabanı boşken ilk giriş yapan yönetici mevcut içeriği yayınlar.
+  const publishIfEmpty = async () => {
+    if (!signedInRef.current || !remoteEmptyRef.current) return;
+    remoteEmptyRef.current = false;
+    const ok = await saveContent(stateRef.current);
+    if (!ok) remoteEmptyRef.current = true;
+    setStatus(ok ? 'saved' : 'error');
+  };
+
+  useEffect(() => {
+    let alive = true;
+    fetchContent().then((result) => {
+      if (!alive) return;
+      if (result.data) {
+        const next = normalize(result.data);
+        setState(next);
+        writeStorage(next);
+      } else if (result.missing) {
+        remoteEmptyRef.current = true;
+        publishIfEmpty();
+      }
+    });
+    const stopWatching = watchSession((active) => {
+      signedInRef.current = active;
+      setSignedIn(active);
+      publishIfEmpty();
+    });
+    return () => {
+      alive = false;
+      stopWatching();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const onStorage = (event) => {
@@ -381,14 +431,16 @@ export function StoreProvider({ children }) {
   const persist = (next) => {
     setStatus('saving');
     window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(() => {
-      try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        setStatus('saved');
-      } catch (error) {
+    timerRef.current = window.setTimeout(async () => {
+      writeStorage(next);
+      if (!signedInRef.current) {
         setStatus('error');
+        return;
       }
-    }, 350);
+      const ok = await saveContent(next);
+      if (ok) remoteEmptyRef.current = false;
+      setStatus(ok ? 'saved' : 'error');
+    }, 600);
   };
 
   const commit = (next) => {
@@ -407,17 +459,11 @@ export function StoreProvider({ children }) {
   };
 
   const reset = () => {
-    window.clearTimeout(timerRef.current);
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch (error) {
-      /* yoksay */
-    }
     setState(DEFAULT_STATE);
-    setStatus('saved');
+    persist(DEFAULT_STATE);
   };
 
-  const value = { state, update, commit, reset, status };
+  const value = { state, update, commit, reset, status, signedIn, signIn, signOut };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
