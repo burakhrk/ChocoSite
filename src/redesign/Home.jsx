@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Home as HomeIcon, LayoutGrid, MapPin, Menu, MessageCircle, Plus, Search, ShoppingBag } from 'lucide-react';
 import { formatPrice, primaryImage, trackingMessage, useStore } from '../store.jsx';
 import { trackContact } from '../analytics.js';
-import { LEGAL_PAGES, legalHref } from './legalPages.js';
+import { legalHref, legalLinks } from './legalPages.js';
 import heroPhoto from '../assets/Images/chocopack.png';
 import { CART_HREF, CartBadge, Drip, NOTE_MAX, NOTE_PRESETS, checker, isIllustration, productHref, useScrollMotion, waLink } from './shared.jsx';
 
@@ -430,7 +430,7 @@ export default function RedesignHome({ shop }) {
             ))}
           </nav>
           <nav aria-label="Bilgilendirme sayfaları" className="cs-footer-links cs-footer-legal">
-            {LEGAL_PAGES.map((page) => (
+            {legalLinks(state.legal).map((page) => (
               <a key={page.slug} href={legalHref(page.slug)}>{page.title}</a>
             ))}
           </nav>

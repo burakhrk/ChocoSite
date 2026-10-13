@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { DEFAULT_LEGAL, normalizeLegal } from './redesign/legalPages.js';
 import { fetchContent, saveContent, signIn, signOut, watchSession } from './supabase.js';
 
 import chocolateBox from './assets/chocolate-box.svg';
@@ -288,6 +289,7 @@ export const DEFAULT_STATE = {
   site: DEFAULT_SITE,
   whatsapp: DEFAULT_WHATSAPP,
   payments: DEFAULT_PAYMENTS,
+  legal: DEFAULT_LEGAL,
 };
 
 // Sipariş takibi artık isimle yapılıyor; kayıtlı içerikte eski varsayılan metinler kaldıysa yenisi kullanılır.
@@ -349,6 +351,7 @@ export const normalize = (input) => {
     site: { ...DEFAULT_SITE, ...dropLegacyTrackTexts(raw.site) },
     whatsapp: { ...DEFAULT_WHATSAPP, ...dropLegacyTrackTexts(raw.whatsapp) },
     payments: normalizePayments(raw.payments),
+    legal: normalizeLegal(raw.legal),
   };
 };
 

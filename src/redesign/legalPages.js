@@ -1,5 +1,5 @@
-// Yasal sayfaların metinleri. Şirket bilgileri yönetim panelinden gelir;
-// boş bırakılan alanlar köşeli parantezle gösterilir ki eksik olduğu belli olsun.
+// Yasal sayfaların varsayılan metinleri. Metinler yönetim panelinden düzenlenebilir;
+// {SIRKET} gibi yer tutucular sayfada şirket bilgileriyle doldurulur.
 export const LEGAL_PAGES = [
   { slug: 'guvenli-alisveris', title: 'Güvenli Alışveriş' },
   { slug: 'kvkk', title: 'KVKK Bilgilendirmesi' },
@@ -10,12 +10,16 @@ export const LEGAL_PAGES = [
 
 export const legalHref = (slug) => `#/sayfa/${slug}`;
 
-const companyInfo = (site) => ({
-  name: site.companyName || '[Şirket unvanı]',
-  address: site.companyAddress || '[Şirket adresi]',
-  email: site.companyEmail || '[E-posta adresi]',
-  tax: site.companyTax || '[Vergi dairesi ve numarası]',
-  phone: site.phone,
+const TOKENS = { name: '{SIRKET}', address: '{ADRES}', email: '{EPOSTA}', tax: '{VERGI}', phone: '{TELEFON}' };
+export const LEGAL_TOKEN_HINT = Object.values(TOKENS).join(', ');
+
+// Panelde boş bırakılan şirket bilgileri köşeli parantezle gösterilir ki eksik olduğu belli olsun.
+const tokenValues = (site) => ({
+  '{SIRKET}': site.companyName || '[Şirket unvanı]',
+  '{ADRES}': site.companyAddress || '[Şirket adresi]',
+  '{EPOSTA}': site.companyEmail || '[E-posta adresi]',
+  '{VERGI}': site.companyTax || '[Vergi dairesi ve numarası]',
+  '{TELEFON}': site.phone,
 });
 
 const PAGE_SECTIONS = {
@@ -217,8 +221,57 @@ const PAGE_SECTIONS = {
   ],
 };
 
-export const legalPage = (slug, site) => {
-  const page = LEGAL_PAGES.find((item) => item.slug === slug);
+// Düzenlenebilir metin biçimi: "## " ile başlayan satır ara başlık, boş satır paragraf ayırıcıdır.
+const HEADING_MARK = '## ';
+
+const sectionsToBody = (sections) =>
+  sections.map((section) => [HEADING_MARK + section.heading, ...section.paragraphs].join('\n\n')).join('\n\n');
+
+const bodyToSections = (body) => {
+  const sections = [];
+  body
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .forEach((block) => {
+      if (block.startsWith(HEADING_MARK)) {
+        sections.push({ heading: block.slice(HEADING_MARK.length).trim(), paragraphs: [] });
+        return;
+      }
+      if (!sections.length) sections.push({ heading: '', paragraphs: [] });
+      sections[sections.length - 1].paragraphs.push(block);
+    });
+  return sections;
+};
+
+export const DEFAULT_LEGAL = Object.fromEntries(
+  LEGAL_PAGES.map((page) => [
+    page.slug,
+    { title: page.title, body: sectionsToBody(PAGE_SECTIONS[page.slug](TOKENS)) },
+  ]),
+);
+
+export const normalizeLegal = (saved) =>
+  Object.fromEntries(
+    LEGAL_PAGES.map(({ slug }) => {
+      const page = (saved && saved[slug]) || {};
+      const fallback = DEFAULT_LEGAL[slug];
+      return [
+        slug,
+        {
+          title: String(page.title || '').trim() ? String(page.title) : fallback.title,
+          body: String(page.body || '').trim() ? String(page.body) : fallback.body,
+        },
+      ];
+    }),
+  );
+
+export const legalLinks = (legal) => LEGAL_PAGES.map(({ slug }) => ({ slug, title: legal[slug].title }));
+
+export const legalPage = (slug, legal, site) => {
+  const page = legal[slug];
   if (!page) return null;
-  return { ...page, sections: PAGE_SECTIONS[slug](companyInfo(site)) };
+  const values = tokenValues(site);
+  const body = Object.keys(values).reduce((text, token) => text.split(token).join(values[token]), page.body);
+  return { slug, title: page.title, sections: bodyToSections(body) };
 };

@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
+  FileText,
   FolderTree,
   GripVertical,
   Image as ImageIcon,
@@ -28,6 +29,7 @@ import {
   X,
 } from 'lucide-react';
 import { uploadImage } from '../supabase.js';
+import { DEFAULT_LEGAL, LEGAL_PAGES, LEGAL_TOKEN_HINT } from '../redesign/legalPages.js';
 import {
   ASSETS,
   ASSET_LABELS,
@@ -49,6 +51,7 @@ const NAV = [
   { id: 'site', label: 'Ana Sayfa Metinleri', icon: Type },
   { id: 'whatsapp', label: 'WhatsApp Şablonları', icon: MessageSquare },
   { id: 'payments', label: 'Ödeme Yöntemleri', icon: CreditCard },
+  { id: 'legal', label: 'Yasal Sayfalar', icon: FileText },
   { id: 'settings', label: 'Ayarlar', icon: Settings },
 ];
 
@@ -1215,6 +1218,58 @@ function PaymentsPage({ store }) {
   );
 }
 
+function LegalPagesPage({ store, notify }) {
+  const { state, update } = store;
+
+  const setPage = (slug, patch) =>
+    update((current) => ({
+      ...current,
+      legal: { ...current.legal, [slug]: { ...current.legal[slug], ...patch } },
+    }));
+
+  const restore = (slug) => {
+    if (!window.confirm('Bu sayfanın metni varsayılan haline dönecek. Emin misiniz?')) return;
+    setPage(slug, DEFAULT_LEGAL[slug]);
+    notify('Varsayılan metin yüklendi.');
+  };
+
+  return (
+    <div className="adm-stack">
+      <Card title="Nasıl düzenlenir?">
+        <p className="adm-hint">
+          Ara başlık eklemek için satırı <code>## </code> ile başlatın; paragrafları boş satırla ayırın. Şu yer
+          tutucular sayfada otomatik doldurulur: <code>{LEGAL_TOKEN_HINT}</code>. Şirket bilgilerini Ana Sayfa
+          Metinleri bölümündeki Şirket bilgileri kartından girebilirsiniz.
+        </p>
+      </Card>
+      {LEGAL_PAGES.map(({ slug }) => (
+        <Card
+          key={slug}
+          title={state.legal[slug].title}
+          hint={`Sayfa adresi: #/sayfa/${slug}`}
+          actions={
+            <button className="adm-btn" onClick={() => restore(slug)}>
+              <RotateCcw size={16} /> Varsayılana dön
+            </button>
+          }
+        >
+          <TextField
+            label="Sayfa başlığı"
+            value={state.legal[slug].title}
+            onChange={(value) => setPage(slug, { title: value })}
+          />
+          <TextField
+            label="Metin"
+            rows={18}
+            value={state.legal[slug].body}
+            onChange={(value) => setPage(slug, { body: value })}
+          />
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 function SettingsPage({ store, notify }) {
   const { state, commit, reset } = store;
   const fileRef = useRef(null);
@@ -1324,6 +1379,7 @@ export default function AdminApp() {
     site: <SiteTextsPage store={store} notify={notify} />,
     whatsapp: <WhatsAppPage store={store} />,
     payments: <PaymentsPage store={store} />,
+    legal: <LegalPagesPage store={store} notify={notify} />,
     settings: <SettingsPage store={store} notify={notify} />,
   };
 

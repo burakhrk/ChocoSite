@@ -1,12 +1,12 @@
 import { useRef } from 'react';
 import { useStore } from '../store.jsx';
 import { Drip, HOME_HREF, SubHeader, useScrollMotion } from './shared.jsx';
-import { LEGAL_PAGES, legalHref, legalPage } from './legalPages.js';
+import { legalHref, legalLinks, legalPage } from './legalPages.js';
 
 export default function LegalPage({ slug }) {
   const { state } = useStore();
   const rootRef = useRef(null);
-  const page = legalPage(slug, state.site);
+  const page = legalPage(slug, state.legal, state.site);
   useScrollMotion(rootRef, [slug]);
 
   if (!page) {
@@ -31,9 +31,9 @@ export default function LegalPage({ slug }) {
 
       <article style={{ padding: '0 var(--gutter) 40px' }}>
         <Drip color="#E3CDF4" />
-        {page.sections.map((section) => (
-          <section key={section.heading} className="cs-legal-section">
-            <h2>{section.heading}</h2>
+        {page.sections.map((section, sectionIndex) => (
+          <section key={sectionIndex} className="cs-legal-section">
+            {section.heading && <h2>{section.heading}</h2>}
             {section.paragraphs.map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
@@ -42,7 +42,7 @@ export default function LegalPage({ slug }) {
       </article>
 
       <nav aria-label="Diğer bilgilendirme sayfaları" className="cs-legal-nav" style={{ padding: '0 var(--gutter) 56px' }}>
-        {LEGAL_PAGES.filter((item) => item.slug !== slug).map((item) => (
+        {legalLinks(state.legal).filter((item) => item.slug !== slug).map((item) => (
           <a key={item.slug} href={legalHref(item.slug)}>{item.title}</a>
         ))}
       </nav>
