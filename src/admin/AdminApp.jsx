@@ -1035,6 +1035,34 @@ function SiteTextsPage({ store, notify }) {
         </div>
       </Card>
 
+      <Card
+        title="Şirket bilgileri"
+        hint="Sözleşme, KVKK ve gizlilik sayfalarında satıcı bilgisi olarak görünür. Boş alanlar sayfada köşeli parantezle belirtilir."
+      >
+        <TextField label="Şirket unvanı" value={site.companyName} onChange={(value) => set('companyName', value)} />
+        <TextField label="Adres" rows={2} value={site.companyAddress} onChange={(value) => set('companyAddress', value)} />
+        <div className="adm-form-row">
+          <TextField label="E-posta" value={site.companyEmail} onChange={(value) => set('companyEmail', value)} />
+          <TextField
+            label="Vergi dairesi ve numarası"
+            value={site.companyTax}
+            onChange={(value) => set('companyTax', value)}
+          />
+        </div>
+      </Card>
+
+      <Card
+        title="Reklam ve ölçüm"
+        hint="Meta (Facebook / Instagram) reklamları için piksel kimliği. Boş bırakılırsa ölçüm kapalıdır."
+      >
+        <TextField
+          label="Meta Pixel ID"
+          value={site.metaPixelId}
+          placeholder="Örn. 123456789012345"
+          onChange={(value) => set('metaPixelId', value.replace(/\D/g, ''))}
+        />
+      </Card>
+
       <Card title="Sipariş takibi paneli">
         <TextField
           label="Açıklama metni"

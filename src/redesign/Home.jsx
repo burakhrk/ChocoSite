@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Home as HomeIcon, LayoutGrid, MapPin, Menu, MessageCircle, Plus, Search, ShoppingBag } from 'lucide-react';
 import { formatPrice, primaryImage, trackingMessage, useStore } from '../store.jsx';
+import { trackContact } from '../analytics.js';
+import { LEGAL_PAGES, legalHref } from './legalPages.js';
 import heroPhoto from '../assets/Images/chocopack.png';
 import { CART_HREF, CartBadge, Drip, NOTE_MAX, NOTE_PRESETS, checker, isIllustration, productHref, useScrollMotion, waLink } from './shared.jsx';
 
@@ -125,6 +127,7 @@ export default function RedesignHome({ shop }) {
     event.preventDefault();
     const value = trackName.trim();
     if (!value) return;
+    trackContact();
     window.open(waLink(trackingMessage(whatsapp.tracking, value)), '_blank', 'noopener,noreferrer');
   };
 
@@ -156,7 +159,7 @@ export default function RedesignHome({ shop }) {
             <button type="button" onClick={scrollTo(catsRef)}>Kategoriler</button>
             <button type="button" onClick={scrollTo(productsRef)}>Ürünler</button>
             <button type="button" onClick={scrollTo(trackRef)}>Sipariş takibi</button>
-            <a href={waLink(whatsapp.order)} target="_blank" rel="noreferrer">WhatsApp</a>
+            <a href={waLink(whatsapp.order)} target="_blank" rel="noreferrer" onClick={trackContact}>WhatsApp</a>
           </nav>
           <button type="button" className="cs-iconbtn cs-mobile-only" aria-label="Ürünlere git" onClick={scrollTo(productsRef)}>
             <Search size={24} strokeWidth={2.4} aria-hidden="true" />
@@ -219,7 +222,7 @@ export default function RedesignHome({ shop }) {
             <button type="button" onClick={scrollTo(productsRef)} style={{ flex: 1, minHeight: 56, border: 0, borderRadius: 999, background: '#3B1A12', color: '#FFD45C', fontWeight: 700, fontSize: 17 }}>
               Hediyeni seç
             </button>
-            <a href={waLink(whatsapp.order)} target="_blank" rel="noreferrer" aria-label={site.menuWhatsappLabel} style={{ width: 56, height: 56, flex: 'none', display: 'grid', placeItems: 'center', borderRadius: '50%', background: '#FFFDF8', border: '2px solid #3B1A12' }}>
+            <a href={waLink(whatsapp.order)} target="_blank" rel="noreferrer" onClick={trackContact} aria-label={site.menuWhatsappLabel} style={{ width: 56, height: 56, flex: 'none', display: 'grid', placeItems: 'center', borderRadius: '50%', background: '#FFFDF8', border: '2px solid #3B1A12' }}>
               <MessageCircle size={26} aria-hidden="true" />
             </a>
           </div>
@@ -412,7 +415,7 @@ export default function RedesignHome({ shop }) {
             Choco<br />Site
           </div>
           <p style={{ marginTop: 18, color: '#EBD9C6', maxWidth: 300 }}>{site.footerTagline}</p>
-          <a href={waLink(whatsapp.order)} target="_blank" rel="noreferrer" className="cs-footer-whatsapp">
+          <a href={waLink(whatsapp.order)} target="_blank" rel="noreferrer" onClick={trackContact} className="cs-footer-whatsapp">
             <MessageCircle size={22} aria-hidden="true" />
             {site.menuWhatsappLabel}
           </a>
@@ -424,6 +427,11 @@ export default function RedesignHome({ shop }) {
               <a key={index} href={link.href} onClick={followFooterLink(link.href)}>
                 {link.label}
               </a>
+            ))}
+          </nav>
+          <nav aria-label="Bilgilendirme sayfaları" className="cs-footer-links cs-footer-legal">
+            {LEGAL_PAGES.map((page) => (
+              <a key={page.slug} href={legalHref(page.slug)}>{page.title}</a>
             ))}
           </nav>
           <a href="#/admin" style={{ display: 'inline-block', marginTop: 18, padding: '12px 0', color: '#EBD9C6', textDecoration: 'underline' }}>
@@ -447,7 +455,7 @@ export default function RedesignHome({ shop }) {
               <LayoutGrid size={24} aria-hidden="true" />
               Kategoriler
             </button>
-            <a className="cs-tab" href={waLink(whatsapp.order)} target="_blank" rel="noreferrer" style={{ justifyContent: 'flex-end' }}>
+            <a className="cs-tab" href={waLink(whatsapp.order)} target="_blank" rel="noreferrer" onClick={trackContact} style={{ justifyContent: 'flex-end' }}>
               <span style={{ width: 58, height: 58, marginTop: -30, borderRadius: '50%', background: '#FFD45C', border: '2px solid #3B1A12', display: 'grid', placeItems: 'center' }}>
                 <MessageCircle size={28} aria-hidden="true" />
               </span>

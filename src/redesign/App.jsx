@@ -4,6 +4,9 @@ import { useStore } from '../store.jsx';
 import RedesignHome from './Home.jsx';
 import ProductPage from './Product.jsx';
 import CartPage from './Cart.jsx';
+import ConsentBanner from './ConsentBanner.jsx';
+import LegalPage from './LegalPage.jsx';
+import { configurePixel, trackAddToCart, trackCheckoutStart, trackPageView, trackViewProduct } from '../analytics.js';
 
 const CART_KEY = 'chocosite.cart.v2';
 
@@ -21,6 +24,8 @@ const parseRoute = () => {
   const product = hash.match(/^#\/urun\/(\d+)/);
   if (product) return { page: 'product', id: Number(product[1]) };
   if (hash.startsWith('#/sepet')) return { page: 'cart' };
+  const legal = hash.match(/^#\/sayfa\/([a-z-]+)/);
+  if (legal) return { page: 'legal', id: legal[1] };
   return { page: 'home' };
 };
 
@@ -58,6 +63,24 @@ export default function RedesignApp() {
     .filter((product) => cart[product.id] > 0)
     .map((product) => ({ product, qty: cart[product.id] }));
 
+  const pixelId = state.site.metaPixelId;
+  useEffect(() => {
+    configurePixel(pixelId);
+  }, [pixelId]);
+
+  // Her sayfa geçişinde görüntüleme, ürün ve sepet sayfalarında ilgili olay gönderilir.
+  useEffect(() => {
+    trackPageView();
+    if (route.page === 'product') {
+      const viewed = products.find((product) => product.id === route.id);
+      if (viewed) trackViewProduct(viewed);
+    }
+    if (route.page === 'cart' && lines.length) {
+      trackCheckoutStart(lines, lines.reduce((sum, line) => sum + line.product.price * line.qty, 0));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route.page, route.id]);
+
   const shop = {
     products,
     lines,
@@ -69,6 +92,7 @@ export default function RedesignApp() {
     add: (product, qty = 1) => {
       setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + qty }));
       setBumpKey((key) => key + 1);
+      trackAddToCart(product, qty);
     },
     setQty: (id, qty) => setCart((current) => ({ ...current, [id]: Math.max(0, qty) })),
     clear: () => setCart({}),
@@ -78,7 +102,9 @@ export default function RedesignApp() {
     <div className="cs-page">
       {route.page === 'product' && <ProductPage key={route.id} id={route.id} shop={shop} />}
       {route.page === 'cart' && <CartPage shop={shop} />}
+      {route.page === 'legal' && <LegalPage key={route.id} slug={route.id} />}
       {route.page === 'home' && <RedesignHome shop={shop} />}
+      {pixelId && <ConsentBanner />}
     </div>
   );
 }

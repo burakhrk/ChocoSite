@@ -430,6 +430,59 @@
   rotate: -2deg;
 }
 
+.cs-root.cs-consent {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 96px;
+  z-index: 60;
+  max-width: 440px;
+  padding: 16px;
+  border: 2px solid var(--cocoa);
+  border-radius: 22px;
+  font-size: 14px;
+  box-shadow: 0 6px 0 var(--cocoa);
+}
+.cs-consent-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cs-root.cs-legal {
+  --gutter: max(20px, calc((100vw - 760px) / 2));
+}
+.cs-legal-section {
+  margin-top: 30px;
+}
+.cs-legal-section h2 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.cs-legal-section p {
+  margin-top: 10px;
+  color: var(--muted);
+}
+.cs-legal-nav {
+  display: flex;
+  flex-direction: column;
+  border-top: 2px dotted var(--cocoa);
+}
+.cs-root .cs-legal-nav a {
+  padding: 14px 0;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.cs-root.cs-consent a {
+  text-decoration: underline;
+  font-weight: 600;
+}
+.cs-footer-legal {
+  font-size: 14px;
+}
+
 .cs-footer-links {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -550,6 +603,11 @@
     max-width: 440px;
     justify-self: center;
     width: 100%;
+  }
+  .cs-root.cs-consent {
+    left: 24px;
+    right: auto;
+    bottom: 24px;
   }
   .cs-minicart {
     align-self: flex-end;

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { MessageCircle, Minus, Plus } from 'lucide-react';
 import { formatPrice, primaryImage, useStore } from '../store.jsx';
+import { trackOrderSent } from '../analytics.js';
 import { DeliveryPicker, Drip, HOME_HREF, NoteCard, SubHeader, isIllustration, orderText, productHref, useScrollMotion, waLink } from './shared.jsx';
 
 const LINE_TONES = ['#FFF3C9', '#EDF7FC', '#F1FAE8', '#F6ECFD'];
@@ -141,7 +142,7 @@ export default function CartPage({ shop }) {
           </section>
 
           <div className="cs-bottombar" style={{ marginTop: 'auto' }}>
-            <a className="cs-cta" href={orderLink} target="_blank" rel="noreferrer" style={{ flex: 1 }}>
+            <a className="cs-cta" href={orderLink} target="_blank" rel="noreferrer" onClick={() => trackOrderSent(lines, total)} style={{ flex: 1 }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
                 <MessageCircle size={24} aria-hidden="true" />
                 WhatsApp ile tamamla
